@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Borrower Detail · LendFlow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/><script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+
+<!-- Simple top bar for detail page -->
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);">
+  <div class="mx-auto max-w-6xl flex items-center justify-between px-6 h-14">
+    <a href="admin-borrowers.html" class="flex items-center gap-2 text-sm font-medium" style="color:var(--text-secondary);"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>Borrowers</a>
+    <button @click="$store.theme.toggle()" class="rounded-lg p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button>
+  </div>
+</header>
+
+<main class="mx-auto max-w-6xl px-6 py-8" x-data="{ tab: 'overview' }">
+  <div class="space-y-6 animate-fade-in">
+
+    <!-- Profile header -->
+    <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-5">
+        <div class="flex h-18 w-18 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-2xl font-bold text-white" style="width:72px;height:72px;">JD</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-[22px] font-bold tracking-tight" style="letter-spacing:-0.02em;">John Doe</h1>
+            <span class="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-semibold" style="background:rgba(16,185,129,0.1);color:#059669;"><svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg>KYC Verified</span>
+            <span class="inline-flex h-6 w-6 items-center justify-center rounded text-[10px] font-bold" style="background:rgba(16,185,129,0.1);color:#059669;">A</span>
+          </div>
+          <p class="text-sm mt-1" style="color:var(--text-muted);">john@example.com · +1 (555) 123-4567 · Member since Jan 2024</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="rounded-xl border px-4 py-2 text-sm font-medium transition" style="border-color:var(--border);color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">Edit</button>
+          <button class="rounded-xl border px-4 py-2 text-sm font-medium transition" style="border-color:rgba(239,68,68,0.3);color:#dc2626;" onmouseover="this.style.background='rgba(239,68,68,0.05)'" onmouseout="this.style.background='transparent'">Blacklist</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI row -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 stagger">
+      <div class="rounded-2xl border p-4 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Credit Score</p><p class="text-xl font-bold font-tabular mt-1">742</p></div>
+      <div class="rounded-2xl border p-4 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Active Loans</p><p class="text-xl font-bold font-tabular mt-1">2</p></div>
+      <div class="rounded-2xl border p-4 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Outstanding</p><p class="text-xl font-bold font-tabular mt-1">$42,680</p></div>
+      <div class="rounded-2xl border p-4 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Total Paid</p><p class="text-xl font-bold font-tabular mt-1 text-emerald-600">$15,280</p></div>
+      <div class="rounded-2xl border p-4 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Days Past Due</p><p class="text-xl font-bold font-tabular mt-1 text-emerald-600">0</p></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex items-center gap-1 border-b" style="border-color:var(--border);">
+      <template x-for="t in [{v:'overview',l:'Overview'},{v:'loans',l:'Loans'},{v:'applications',l:'Applications'},{v:'documents',l:'Documents'},{v:'activity',l:'Activity'}]" :key="t.v">
+        <button @click="tab=t.v" class="relative px-4 py-3 text-sm font-medium transition" :style="tab===t.v?'color:var(--brand-600);':'color:var(--text-muted);'" x-text="t.l"><div x-show="tab===t.v" class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full"></div></button>
+      </template>
+    </div>
+
+    <!-- Overview Tab -->
+    <div x-show="tab==='overview'" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Personal -->
+        <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+          <h3 class="text-sm font-semibold mb-5">Personal Information</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-5 text-sm">
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Full Name</p><p class="font-medium mt-1">John Doe</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Date of Birth</p><p class="font-medium mt-1">Jan 15, 1990</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">SSN</p><p class="font-mono font-medium mt-1">***-**-4567</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Email</p><p class="font-medium mt-1">john@example.com</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Phone</p><p class="font-medium mt-1">+1 (555) 123-4567</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Address</p><p class="font-medium mt-1">123 Main St, NY 10001</p></div>
+          </div>
+        </div>
+        <!-- Employment -->
+        <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+          <h3 class="text-sm font-semibold mb-5">Employment & Income</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-5 text-sm">
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Status</p><p class="font-medium mt-1">Full-time</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Employer</p><p class="font-medium mt-1">Acme Corporation</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Title</p><p class="font-medium mt-1">Software Engineer</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Annual Income</p><p class="font-semibold font-mono mt-1">$95,000</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Monthly Expenses</p><p class="font-medium font-mono mt-1">$3,500</p></div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">DTI Ratio</p><p class="font-medium mt-1">28%</p></div>
+          </div>
+        </div>
+        <!-- Active Loans -->
+        <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+          <h3 class="text-sm font-semibold mb-4">Active Loans</h3>
+          <div class="space-y-3">
+            <div class="flex items-center gap-4 rounded-xl p-4" style="background:var(--surface-secondary);">
+              <div class="relative h-12 w-12 flex-shrink-0"><svg class="h-12 w-12" viewBox="0 0 48 48" style="transform:rotate(-90deg);"><circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="3"/><circle cx="24" cy="24" r="20" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="37.7"/></svg><div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold font-tabular">70%</div></div>
+              <div class="flex-1"><p class="text-sm font-semibold">Personal Loan · LN-2024-00847</p><p class="text-xs mt-0.5" style="color:var(--text-muted);">$25,000 at 8.5% · 36 months</p></div>
+              <div class="text-right"><p class="text-sm font-semibold font-mono">$18,430</p><p class="text-xs" style="color:var(--text-muted);">Outstanding</p></div>
+            </div>
+            <div class="flex items-center gap-4 rounded-xl p-4" style="background:var(--surface-secondary);">
+              <div class="relative h-12 w-12 flex-shrink-0"><svg class="h-12 w-12" viewBox="0 0 48 48" style="transform:rotate(-90deg);"><circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="3"/><circle cx="24" cy="24" r="20" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="100.53"/></svg><div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold font-tabular">20%</div></div>
+              <div class="flex-1"><p class="text-sm font-semibold">Auto Loan · LN-2025-01234</p><p class="text-xs mt-0.5" style="color:var(--text-muted);">$30,000 at 6.2% · 48 months</p></div>
+              <div class="text-right"><p class="text-sm font-semibold font-mono">$24,250</p><p class="text-xs" style="color:var(--text-muted);">Outstanding</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Risk Profile -->
+        <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+          <h3 class="text-sm font-semibold mb-4">Risk Profile</h3>
+          <div class="flex items-center gap-4 mb-4">
+            <div class="relative h-20 w-20 flex-shrink-0"><svg class="h-20 w-20" viewBox="0 0 80 80" style="transform:rotate(-90deg);"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--border)" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round" stroke-dasharray="213.63" stroke-dashoffset="30"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-lg font-bold font-tabular">742</span><span class="text-[9px]" style="color:var(--text-muted);">Score</span></div></div>
+            <div class="space-y-1.5"><div class="flex items-center gap-2"><span class="inline-flex h-5 w-5 items-center justify-center rounded text-[9px] font-bold" style="background:rgba(16,185,129,0.1);color:#059669;">A</span><span class="text-sm font-medium">Grade A</span></div><p class="text-xs" style="color:var(--text-muted);">Low risk borrower</p><p class="text-xs" style="color:var(--text-muted);">Auto-approval eligible</p></div>
+          </div>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span style="color:var(--text-muted);">Bureau Score</span><span class="font-medium">742 (Excellent)</span></div>
+            <div class="flex justify-between"><span style="color:var(--text-muted);">DTI Ratio</span><span class="font-medium">28%</span></div>
+            <div class="flex justify-between"><span style="color:var(--text-muted);">Payment History</span><span class="font-medium text-emerald-600">100% on time</span></div>
+            <div class="flex justify-between"><span style="color:var(--text-muted);">Employment</span><span class="font-medium">3+ years</span></div>
+          </div>
+        </div>
+
+        <!-- KYC Details -->
+        <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+          <h3 class="text-sm font-semibold mb-3">Verification</h3>
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-2.5"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg><span class="text-sm">Identity verified</span></div>
+            <div class="flex items-center gap-2.5"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg><span class="text-sm">Address verified</span></div>
+            <div class="flex items-center gap-2.5"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg><span class="text-sm">Income verified</span></div>
+            <div class="flex items-center gap-2.5"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg><span class="text-sm">Sanctions check clear</span></div>
+            <div class="flex items-center gap-2.5"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg><span class="text-sm">MFA enabled</span></div>
+          </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+          <h3 class="text-sm font-semibold mb-4">Recent Activity</h3>
+          <div class="space-y-0">
+            <template x-for="(e,i) in [{t:'Payment $847.50',d:'Mar 15'},{t:'Auto-debit scheduled',d:'Apr 1'},{t:'Statement generated',d:'Mar 1'},{t:'Login from Chrome/Win',d:'Mar 27'}]" :key="i">
+              <div class="flex gap-3 pb-3"><div class="flex flex-col items-center"><div class="h-2 w-2 rounded-full mt-1.5" style="background:var(--border-strong);"></div><div x-show="i<3" class="w-px flex-1 mt-1" style="background:var(--border);"></div></div><div><p class="text-sm" x-text="e.t"></p><p class="text-xs" style="color:var(--text-muted);" x-text="e.d"></p></div></div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other tabs placeholder -->
+    <div x-show="tab==='loans'" class="rounded-2xl border p-12 text-center shadow-sm" style="background:var(--surface);border-color:var(--border);">
+      <svg class="h-12 w-12 mx-auto mb-4" style="color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75"/></svg>
+      <p class="text-sm font-medium">Loan details and repayment history for this borrower.</p>
+      <p class="text-xs mt-1" style="color:var(--text-muted);">Detailed tables would load here via HTMX in production.</p>
+    </div>
+    <div x-show="tab==='applications'" class="rounded-2xl border p-12 text-center shadow-sm" style="background:var(--surface);border-color:var(--border);">
+      <p class="text-sm font-medium">All applications submitted by this borrower.</p>
+      <p class="text-xs mt-1" style="color:var(--text-muted);">3 applications found.</p>
+    </div>
+    <div x-show="tab==='documents'" class="rounded-2xl border p-12 text-center shadow-sm" style="background:var(--surface);border-color:var(--border);">
+      <p class="text-sm font-medium">Uploaded documents and verification status.</p>
+      <p class="text-xs mt-1" style="color:var(--text-muted);">4 documents verified.</p>
+    </div>
+    <div x-show="tab==='activity'" class="rounded-2xl border p-12 text-center shadow-sm" style="background:var(--surface);border-color:var(--border);">
+      <p class="text-sm font-medium">Complete audit trail of all borrower activity.</p>
+      <p class="text-xs mt-1" style="color:var(--text-muted);">Login history, payments, applications, and more.</p>
+    </div>
+  </div>
+</main>
+<script>
+if (!api.isLoggedIn()) window.location.href = 'login.html';
+const bid = new URLSearchParams(window.location.search).get('id');
+if (bid) {
+  api.getBorrower(bid).then(b => {
+    const p = b.profile || {};
+    const h1 = document.querySelector('h1');
+    if (h1) h1.textContent = p.first_name + ' ' + p.last_name;
+    console.log('Borrower loaded:', b);
+  }).catch(e => console.error(e));
+}
+</script>
+</body>
+</html>

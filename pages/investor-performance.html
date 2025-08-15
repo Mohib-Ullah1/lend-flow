@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Performance · LendFlow Investor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/><script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);"><div class="mx-auto max-w-6xl flex items-center justify-between px-6 h-16"><a href="#" class="flex items-center gap-2.5"><div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600"><svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75"/></svg></div><span class="text-base font-semibold">LendFlow</span></a><nav class="hidden sm:flex items-center gap-1"><a href="investor-dashboard.html" class="rounded-lg px-3 py-2 text-sm font-medium transition" style="color:var(--text-secondary);">Portfolio</a><a href="investor-performance.html" class="rounded-lg px-3 py-2 text-sm font-medium text-brand-600" style="background:rgba(97,114,243,0.08);">Performance</a><a href="investor-marketplace.html" class="rounded-lg px-3 py-2 text-sm font-medium transition" style="color:var(--text-secondary);">Marketplace</a><a href="investor-reports.html" class="rounded-lg px-3 py-2 text-sm font-medium transition" style="color:var(--text-secondary);">Reports</a></nav><div class="flex items-center gap-3"><button @click="$store.theme.toggle()" class="rounded-lg p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button><div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white">RJ</div></div></div></header>
+
+<main class="mx-auto max-w-6xl px-6 py-8">
+  <div class="space-y-8 animate-fade-in">
+    <div><h1 class="text-[24px] font-bold tracking-tight" style="letter-spacing:-0.02em;">Performance Analytics</h1><p class="mt-1 text-sm" style="color:var(--text-muted);">Detailed breakdown of your portfolio performance.</p></div>
+
+    <!-- Performance metrics grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 stagger">
+      <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Gross Yield</p><p class="text-2xl font-bold font-tabular mt-1">16.8%</p></div>
+      <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Net Yield</p><p class="text-2xl font-bold font-tabular mt-1 text-emerald-600">14.2%</p></div>
+      <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Loss Rate</p><p class="text-2xl font-bold font-tabular mt-1">2.1%</p></div>
+      <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Avg. Loan Age</p><p class="text-2xl font-bold font-tabular mt-1">8.4 mo</p></div>
+    </div>
+
+    <!-- PAR Analysis -->
+    <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+      <h3 class="text-base font-semibold mb-6" style="letter-spacing:-0.01em;">Portfolio at Risk (PAR)</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-6">
+        <template x-for="par in [{label:'Current',pct:'90.2%',amt:'$3.79M',color:'emerald'},{label:'PAR 1-30',pct:'5.8%',amt:'$244K',color:'amber'},{label:'PAR 31-60',pct:'2.2%',amt:'$92K',color:'orange'},{label:'PAR 60+',pct:'1.8%',amt:'$76K',color:'red'}]" :key="par.label">
+          <div>
+            <div class="flex items-center justify-between mb-2"><span class="text-sm font-medium" x-text="par.label"></span><span class="text-sm font-bold font-mono" :class="'text-'+par.color+'-600'" x-text="par.pct"></span></div>
+            <div class="h-3 rounded-full overflow-hidden" style="background:var(--surface-tertiary);"><div class="h-full rounded-full transition-all duration-1000" :class="'bg-'+par.color+'-500'" :style="'width:'+par.pct"></div></div>
+            <p class="text-xs font-mono mt-1.5" style="color:var(--text-muted);" x-text="par.amt"></p>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Monthly returns table -->
+    <div class="rounded-2xl border shadow-sm overflow-hidden" style="background:var(--surface);border-color:var(--border);">
+      <div class="px-5 py-4 border-b" style="border-color:var(--border);"><h3 class="text-sm font-semibold">Monthly Performance</h3></div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr style="background:var(--surface-secondary);"><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Month</th><th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Interest Earned</th><th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Principal Returned</th><th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Defaults</th><th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Net Return</th><th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Monthly Yield</th></tr></thead>
+          <tbody class="divide-y" style="border-color:var(--border);">
+            <template x-for="m in [
+              {month:'Mar 2026',interest:'$4,218',principal:'$28,450',defaults:'$0',net:'$4,218',yield:'1.2%'},
+              {month:'Feb 2026',interest:'$4,105',principal:'$27,890',defaults:'$850',net:'$3,255',yield:'0.9%'},
+              {month:'Jan 2026',interest:'$3,980',principal:'$27,340',defaults:'$0',net:'$3,980',yield:'1.1%'},
+              {month:'Dec 2025',interest:'$4,320',principal:'$28,100',defaults:'$0',net:'$4,320',yield:'1.2%'},
+              {month:'Nov 2025',interest:'$3,890',principal:'$26,780',defaults:'$1,200',net:'$2,690',yield:'0.8%'},
+              {month:'Oct 2025',interest:'$4,150',principal:'$27,560',defaults:'$0',net:'$4,150',yield:'1.2%'}
+            ]" :key="m.month">
+              <tr class="transition" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+                <td class="px-5 py-3.5 font-medium" x-text="m.month"></td>
+                <td class="px-5 py-3.5 text-right font-mono text-emerald-600 font-medium" x-text="m.interest"></td>
+                <td class="px-5 py-3.5 text-right font-mono" style="color:var(--text-secondary);" x-text="m.principal"></td>
+                <td class="px-5 py-3.5 text-right font-mono" :style="m.defaults==='$0'?'color:var(--text-muted);':'color:#dc2626;font-weight:500;'" x-text="m.defaults"></td>
+                <td class="px-5 py-3.5 text-right font-mono font-semibold" x-text="m.net"></td>
+                <td class="px-5 py-3.5 text-right"><span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-500" x-text="m.yield"></span></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+if (!api.isLoggedIn()) window.location.href = 'login.html';
+api.getPortfolios().then(res => {
+  const p = res.results?.[0];
+  if (p) console.log('Portfolio IRR:', p.irr, 'PAR30:', p.par_30, 'Default:', p.default_rate);
+}).catch(e => console.error(e));
+</script>
+</body>
+</html>

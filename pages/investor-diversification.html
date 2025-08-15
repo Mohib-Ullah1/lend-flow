@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Diversification · LendFlow Investor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/><script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);"><div class="mx-auto max-w-5xl flex items-center justify-between px-6 h-14"><a href="investor-dashboard.html" class="flex items-center gap-2 text-sm font-medium" style="color:var(--text-secondary);"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>Portfolio</a><button @click="$store.theme.toggle()" class="rounded-lg p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button></div></header>
+
+<main class="mx-auto max-w-5xl px-6 py-8">
+  <div class="space-y-8 animate-fade-in">
+    <div><h1 class="text-[24px] font-bold tracking-tight" style="letter-spacing:-0.02em;">Portfolio Diversification</h1><p class="mt-1 text-sm" style="color:var(--text-muted);">Analyze allocation across risk grades, products, and terms.</p></div>
+
+    <!-- Allocation charts -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <!-- By Grade -->
+      <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+        <h3 class="text-sm font-semibold mb-5">By Risk Grade</h3>
+        <div class="relative h-40 w-40 mx-auto mb-5"><svg viewBox="0 0 100 100" class="h-40 w-40" style="transform:rotate(-90deg);"><circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="14" stroke-dasharray="71.6 167"/><circle cx="50" cy="50" r="38" fill="none" stroke="#3b82f6" stroke-width="14" stroke-dasharray="47.7 167" stroke-dashoffset="-71.6"/><circle cx="50" cy="50" r="38" fill="none" stroke="#f59e0b" stroke-width="14" stroke-dasharray="35.8 167" stroke-dashoffset="-119.4"/><circle cx="50" cy="50" r="38" fill="none" stroke="#ef4444" stroke-width="14" stroke-dasharray="11.9 167" stroke-dashoffset="-155.2"/></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-lg font-bold font-tabular">$4.2M</span><span class="text-[9px]" style="color:var(--text-muted);">Total</span></div></div>
+        <div class="space-y-2.5 text-sm">
+          <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="h-3 w-3 rounded-sm bg-emerald-500"></span>Grade A (30%)</div><span class="font-mono font-medium">$1.26M</span></div>
+          <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="h-3 w-3 rounded-sm bg-blue-500"></span>Grade B (20%)</div><span class="font-mono font-medium">$840K</span></div>
+          <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="h-3 w-3 rounded-sm bg-amber-500"></span>Grade C (15%)</div><span class="font-mono font-medium">$630K</span></div>
+          <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="h-3 w-3 rounded-sm bg-red-500"></span>Grade D-E (5%)</div><span class="font-mono font-medium">$210K</span></div>
+        </div>
+      </div>
+
+      <!-- By Product -->
+      <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+        <h3 class="text-sm font-semibold mb-5">By Product Type</h3>
+        <div class="space-y-4 mt-8">
+          <template x-for="p in [{name:'Personal Loans',pct:45,amt:'$1.89M',color:'brand'},{name:'Auto Loans',pct:30,amt:'$1.26M',color:'emerald'},{name:'Business Loans',pct:25,amt:'$1.05M',color:'amber'}]" :key="p.name">
+            <div>
+              <div class="flex justify-between text-sm mb-1.5"><span class="font-medium" x-text="p.name"></span><div><span class="font-mono font-semibold" x-text="p.amt"></span><span class="text-xs ml-1.5" style="color:var(--text-muted);" x-text="p.pct+'%'"></span></div></div>
+              <div class="h-3 rounded-full overflow-hidden" style="background:var(--surface-tertiary);"><div class="h-full rounded-full transition-all duration-1000" :class="'bg-'+p.color+'-500'" :style="'width:'+p.pct+'%'"></div></div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- By Term -->
+      <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+        <h3 class="text-sm font-semibold mb-5">By Loan Term</h3>
+        <div class="space-y-4 mt-8">
+          <template x-for="t in [{name:'12 months',pct:15,amt:'$630K',color:'emerald'},{name:'24 months',pct:20,amt:'$840K',color:'blue'},{name:'36 months',pct:35,amt:'$1.47M',color:'brand'},{name:'48 months',pct:18,amt:'$756K',color:'amber'},{name:'60+ months',pct:12,amt:'$504K',color:'violet'}]" :key="t.name">
+            <div>
+              <div class="flex justify-between text-sm mb-1.5"><span class="font-medium" x-text="t.name"></span><div><span class="font-mono font-semibold" x-text="t.amt"></span><span class="text-xs ml-1.5" style="color:var(--text-muted);" x-text="t.pct+'%'"></span></div></div>
+              <div class="h-3 rounded-full overflow-hidden" style="background:var(--surface-tertiary);"><div class="h-full rounded-full transition-all duration-1000" :class="'bg-'+t.color+'-500'" :style="'width:'+t.pct+'%'"></div></div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Concentration risks -->
+    <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+      <h3 class="text-base font-semibold mb-5" style="letter-spacing:-0.01em;">Concentration Analysis</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="rounded-xl p-4" style="background:var(--surface-secondary);">
+          <div class="flex items-center gap-2 mb-2"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg><p class="text-sm font-semibold text-emerald-700">Well Diversified</p></div>
+          <p class="text-xs" style="color:var(--text-muted);">No single borrower exceeds 5% of portfolio.</p>
+          <p class="text-sm font-mono font-medium mt-2">Max exposure: 3.8%</p>
+        </div>
+        <div class="rounded-xl p-4" style="background:var(--surface-secondary);">
+          <div class="flex items-center gap-2 mb-2"><svg class="h-4 w-4 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg><p class="text-sm font-semibold" style="color:#d97706;">Moderate Concentration</p></div>
+          <p class="text-xs" style="color:var(--text-muted);">Personal loans account for 45%. Consider diversifying into auto/business.</p>
+          <p class="text-sm font-mono font-medium mt-2">Target: &lt; 40% per type</p>
+        </div>
+        <div class="rounded-xl p-4" style="background:var(--surface-secondary);">
+          <div class="flex items-center gap-2 mb-2"><svg class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg><p class="text-sm font-semibold text-emerald-700">Good Term Mix</p></div>
+          <p class="text-xs" style="color:var(--text-muted);">Weighted average maturity of 32 months provides balanced cash flow.</p>
+          <p class="text-sm font-mono font-medium mt-2">WAM: 32 months</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+if (!api.isLoggedIn()) window.location.href = 'login.html';
+api.getInvestments().then(res => console.log('Investments for diversification:', res.count)).catch(e => console.error(e));
+</script>
+</body>
+</html>

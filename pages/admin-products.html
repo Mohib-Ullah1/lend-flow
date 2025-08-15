@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Loan Products · LendFlow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/><script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);"><div class="mx-auto max-w-5xl flex items-center justify-between px-6 h-14"><a href="admin-settings.html" class="flex items-center gap-2 text-sm font-medium" style="color:var(--text-secondary);"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>Settings</a><button @click="$store.theme.toggle()" class="rounded-lg p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button></div></header>
+
+<main class="mx-auto max-w-5xl px-6 py-8" x-data="{ showAdd: false }">
+  <div class="space-y-6 animate-fade-in">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div><h1 class="text-[24px] font-bold tracking-tight" style="letter-spacing:-0.02em;">Loan Products</h1><p class="mt-1 text-sm" style="color:var(--text-muted);">Configure loan products available to borrowers.</p></div>
+      <button @click="showAdd=true" class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 btn-glow"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>Add Product</button>
+    </div>
+
+    <!-- Product cards -->
+    <div class="space-y-4 stagger">
+      <template x-for="p in [
+        {name:'Personal Loan',type:'personal',active:true,minAmt:'$1,000',maxAmt:'$100,000',baseRate:'7.5%',maxRate:'14.5%',minTerm:'12',maxTerm:'60',fee:'1%',lateFee:'$25',grace:'5 days',repay:'EMI',collateral:false,loans:245,volume:'$4.2M'},
+        {name:'Auto Loan',type:'auto',active:true,minAmt:'$5,000',maxAmt:'$75,000',baseRate:'4.5%',maxRate:'9.5%',minTerm:'24',maxTerm:'72',fee:'0.5%',lateFee:'$35',grace:'5 days',repay:'EMI',collateral:true,loans:128,volume:'$3.8M'},
+        {name:'Business Loan',type:'business',active:true,minAmt:'$10,000',maxAmt:'$500,000',baseRate:'3.5%',maxRate:'8.5%',minTerm:'12',maxTerm:'84',fee:'1.5%',lateFee:'$50',grace:'7 days',repay:'EMI',collateral:false,loans:39,volume:'$6.1M'},
+        {name:'Buy Now Pay Later',type:'bnpl',active:false,minAmt:'$100',maxAmt:'$5,000',baseRate:'0%',maxRate:'0%',minTerm:'3',maxTerm:'12',fee:'0%',lateFee:'$10',grace:'0 days',repay:'Equal Split',collateral:false,loans:0,volume:'$0'}
+      ]" :key="p.type">
+        <div class="rounded-2xl border shadow-sm overflow-hidden" style="background:var(--surface);border-color:var(--border);">
+          <div class="flex items-center justify-between p-5 border-b" style="border-color:var(--border);">
+            <div class="flex items-center gap-3">
+              <h3 class="text-base font-semibold" x-text="p.name"></h3>
+              <span class="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-semibold" :style="p.active?'background:rgba(16,185,129,0.1);color:#059669;':'background:var(--surface-tertiary);color:var(--text-muted);'" x-text="p.active?'Active':'Inactive'"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs" style="color:var(--text-muted);"><span class="font-mono font-semibold" x-text="p.loans"></span> active loans · <span class="font-mono font-semibold" x-text="p.volume"></span> volume</span>
+              <button class="rounded-lg px-3 py-1.5 text-xs font-medium text-brand-600 transition" style="background:rgba(97,114,243,0.08);">Edit</button>
+            </div>
+          </div>
+          <div class="p-5">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4 text-sm">
+              <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Amount Range</p><p class="font-mono font-medium mt-1" x-text="p.minAmt+' — '+p.maxAmt"></p></div>
+              <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Rate Range</p><p class="font-mono font-medium mt-1" x-text="p.baseRate+' — '+p.maxRate"></p></div>
+              <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Term Range</p><p class="font-medium mt-1" x-text="p.minTerm+' — '+p.maxTerm+' months'"></p></div>
+              <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Origination Fee</p><p class="font-mono font-medium mt-1" x-text="p.fee"></p></div>
+              <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Late Fee</p><p class="font-mono font-medium mt-1" x-text="p.lateFee+' ('+p.grace+' grace)'"></p></div>
+              <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Repayment</p><p class="font-medium mt-1" x-text="p.repay + (p.collateral ? ' · Collateral' : '')"></p></div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- Add product modal -->
+  <div x-show="showAdd" x-cloak class="fixed inset-0 z-50"><div x-transition.opacity class="fixed inset-0 bg-black/40 backdrop-blur-sm" @click="showAdd=false"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div x-show="showAdd" x-transition class="w-full max-w-lg rounded-3xl border p-8 shadow-lg max-h-[85vh] overflow-y-auto" style="background:var(--surface);border-color:var(--border);"><h3 class="text-lg font-semibold mb-1">Add Loan Product</h3><p class="text-sm mb-6" style="color:var(--text-secondary);">Configure a new loan product for borrowers.</p>
+    <div class="space-y-4 mb-6">
+      <div><label class="block text-[13px] font-medium mb-1.5">Product name</label><input type="text" placeholder="e.g. Home Improvement Loan" class="w-full rounded-xl border py-2.5 px-4 text-sm" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div>
+      <div><label class="block text-[13px] font-medium mb-1.5">Product type</label><select class="w-full rounded-xl border py-2.5 px-4 text-sm" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"><option>Personal</option><option>Auto</option><option>Business</option><option>Mortgage</option><option>Line of Credit</option><option>BNPL</option></select></div>
+      <div class="grid grid-cols-2 gap-3"><div><label class="block text-[13px] font-medium mb-1.5">Min amount</label><input type="text" placeholder="$1,000" class="w-full rounded-xl border py-2.5 px-4 text-sm font-mono" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div><div><label class="block text-[13px] font-medium mb-1.5">Max amount</label><input type="text" placeholder="$100,000" class="w-full rounded-xl border py-2.5 px-4 text-sm font-mono" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div></div>
+      <div class="grid grid-cols-2 gap-3"><div><label class="block text-[13px] font-medium mb-1.5">Base rate (%)</label><input type="text" placeholder="7.5" class="w-full rounded-xl border py-2.5 px-4 text-sm font-mono" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div><div><label class="block text-[13px] font-medium mb-1.5">Origination fee (%)</label><input type="text" placeholder="1.0" class="w-full rounded-xl border py-2.5 px-4 text-sm font-mono" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div></div>
+      <div class="grid grid-cols-2 gap-3"><div><label class="block text-[13px] font-medium mb-1.5">Min term (months)</label><input type="text" placeholder="12" class="w-full rounded-xl border py-2.5 px-4 text-sm font-mono" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div><div><label class="block text-[13px] font-medium mb-1.5">Max term (months)</label><input type="text" placeholder="60" class="w-full rounded-xl border py-2.5 px-4 text-sm font-mono" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div></div>
+      <div><label class="block text-[13px] font-medium mb-1.5">Repayment type</label><select class="w-full rounded-xl border py-2.5 px-4 text-sm" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"><option>EMI (Equal Monthly)</option><option>Bullet</option><option>Balloon</option><option>Interest Only</option></select></div>
+      <label class="flex items-center gap-3"><input type="checkbox" class="h-4 w-4 rounded border text-brand-600" style="border-color:var(--border-strong);"/><span class="text-sm" style="color:var(--text-secondary);">Requires collateral</span></label>
+    </div>
+    <div class="flex gap-3"><button @click="showAdd=false" class="flex-1 rounded-xl border py-3 text-sm font-medium" style="border-color:var(--border);color:var(--text-secondary);">Cancel</button><button @click="showAdd=false" class="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Create Product</button></div>
+  </div></div></div>
+</main>
+<script>
+if (!api.isLoggedIn()) window.location.href = 'login.html';
+api.getLoanProducts().then(res => console.log('Products:', res.count)).catch(e => console.error(e));
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Reconciliation · LendFlow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/><script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);"><div class="mx-auto max-w-5xl flex items-center justify-between px-6 h-14"><a href="admin-ledger.html" class="flex items-center gap-2 text-sm font-medium" style="color:var(--text-secondary);"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>Ledger</a><button @click="$store.theme.toggle()" class="rounded-lg p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button></div></header>
+
+<main class="mx-auto max-w-5xl px-6 py-8" x-data="{ running: false, done: false }">
+  <div class="space-y-6 animate-fade-in">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div><h1 class="text-[24px] font-bold tracking-tight" style="letter-spacing:-0.02em;">Reconciliation</h1><p class="mt-1 text-sm" style="color:var(--text-muted);">Compare ledger entries against bank statements and flag discrepancies.</p></div>
+      <button @click="running=true; setTimeout(()=>{running=false;done=true;},3000);" :disabled="running" class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60 btn-glow">
+        <svg x-show="!running" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+        <svg x-show="running" x-cloak class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        <span x-text="running ? 'Running...' : 'Run Reconciliation'"></span>
+      </button>
+    </div>
+
+    <!-- Running state -->
+    <div x-show="running" x-transition class="rounded-2xl border p-8 text-center shadow-sm" style="background:var(--surface);border-color:var(--border);">
+      <svg class="h-12 w-12 animate-spin mx-auto text-brand-500 mb-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      <h3 class="text-base font-semibold mb-2">Reconciling accounts...</h3>
+      <p class="text-sm" style="color:var(--text-muted);">Comparing 2,847 journal entries against bank statements. This usually takes a few seconds.</p>
+      <div class="h-2 rounded-full overflow-hidden mt-6 max-w-xs mx-auto" style="background:var(--surface-tertiary);"><div class="h-full rounded-full bg-brand-500" style="animation: progress-fill 3s linear forwards; --progress: 100%;"></div></div>
+    </div>
+
+    <!-- Results -->
+    <div x-show="!running" class="space-y-6">
+      <!-- Status -->
+      <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+        <div class="flex items-center gap-4">
+          <div class="flex h-14 w-14 items-center justify-center rounded-2xl" :style="done ? 'background:rgba(16,185,129,0.1);' : 'background:var(--surface-tertiary);'">
+            <svg x-show="done" class="h-7 w-7 text-emerald-500 animate-bounce-in" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg>
+            <svg x-show="!done" class="h-7 w-7" style="color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+          </div>
+          <div><h3 class="text-base font-semibold" :class="done ? 'text-emerald-700' : ''" x-text="done ? 'All accounts balanced!' : 'Last reconciliation: Mar 27 at 3:00 AM'"></h3><p class="text-sm" style="color:var(--text-muted);" x-text="done ? 'Completed just now · 2,847 entries checked · 0 discrepancies' : 'Next scheduled: Mar 28 at 3:00 AM UTC'"></p></div>
+        </div>
+      </div>
+
+      <!-- Comparison table -->
+      <div class="rounded-2xl border shadow-sm overflow-hidden" style="background:var(--surface);border-color:var(--border);">
+        <div class="px-5 py-4 border-b" style="border-color:var(--border);"><h3 class="text-sm font-semibold">Account Balances Comparison</h3></div>
+        <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr style="background:var(--surface-secondary);"><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Account</th><th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Ledger Balance</th><th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Bank Balance</th><th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Difference</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Status</th></tr></thead>
+          <tbody class="divide-y" style="border-color:var(--border);">
+            <template x-for="a in [
+              {name:'1000 Cash & Equivalents',ledger:'$4,218,400.00',bank:'$4,218,400.00',diff:'$0.00',ok:true},
+              {name:'1200 Loans Receivable',ledger:'$18,432,100.00',bank:'$18,432,100.00',diff:'$0.00',ok:true},
+              {name:'1300 Interest Receivable',ledger:'$142,800.00',bank:'$142,800.00',diff:'$0.00',ok:true},
+              {name:'2000 Deposits Payable',ledger:'$16,890,200.00',bank:'$16,890,200.00',diff:'$0.00',ok:true},
+              {name:'4100 Fee Income',ledger:'$89,200.00',bank:'$89,200.00',diff:'$0.00',ok:true},
+              {name:'4200 Interest Income',ledger:'$342,100.00',bank:'$342,100.00',diff:'$0.00',ok:true}
+            ]" :key="a.name">
+              <tr class="transition" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+                <td class="px-5 py-3 font-medium text-xs" x-text="a.name"></td>
+                <td class="px-5 py-3 text-right font-mono" x-text="a.ledger"></td>
+                <td class="px-5 py-3 text-right font-mono" x-text="a.bank"></td>
+                <td class="px-5 py-3 text-right font-mono" :style="a.ok ? 'color:var(--text-muted);' : 'color:#dc2626;font-weight:600;'" x-text="a.diff"></td>
+                <td class="px-5 py-3"><span class="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-semibold" :style="a.ok ? 'background:rgba(16,185,129,0.1);color:#059669;' : 'background:rgba(239,68,68,0.1);color:#dc2626;'" x-text="a.ok ? 'Matched' : 'Mismatch'"></span></td>
+              </tr>
+            </template>
+          </tbody>
+        </table></div>
+      </div>
+
+      <!-- History -->
+      <div class="rounded-2xl border p-6 shadow-sm" style="background:var(--surface);border-color:var(--border);">
+        <h3 class="text-sm font-semibold mb-4">Reconciliation History</h3>
+        <div class="space-y-2">
+          <template x-for="r in [{date:'Mar 27, 3:00 AM',entries:2847,disc:0,time:'4.2s'},{date:'Mar 26, 3:00 AM',entries:2834,disc:0,time:'3.9s'},{date:'Mar 25, 3:00 AM',entries:2821,disc:0,time:'4.1s'},{date:'Mar 24, 3:00 AM',entries:2808,disc:1,time:'4.5s'},{date:'Mar 23, 3:00 AM',entries:2795,disc:0,time:'3.8s'},{date:'Mar 22, 3:00 AM',entries:2782,disc:0,time:'4.0s'}]" :key="r.date">
+            <div class="flex items-center justify-between rounded-xl p-3" style="background:var(--surface-secondary);">
+              <div class="flex items-center gap-3">
+                <svg class="h-4 w-4" :class="r.disc===0?'text-emerald-500':'text-amber-500'" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" x-show="r.disc===0" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/><path x-show="r.disc>0" fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>
+                <span class="text-sm font-medium" x-text="r.date"></span>
+              </div>
+              <div class="flex items-center gap-6 text-xs" style="color:var(--text-muted);"><span x-text="r.entries+' entries'"></span><span :class="r.disc>0?'text-amber-600 font-semibold':''" x-text="r.disc+' disc.'"></span><span x-text="r.time"></span></div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>if (!api.isLoggedIn()) window.location.href = "login.html";</script>
+</body>
+</html>

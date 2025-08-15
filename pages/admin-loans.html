@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Active Loans · LendFlow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/><script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+<div class="flex h-screen overflow-hidden">
+  <aside class="hidden lg:flex w-[260px] flex-col border-r" style="background:var(--surface);border-color:var(--border);"><div class="flex h-16 items-center px-4"><a href="#" class="flex items-center gap-2.5"><div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600"><svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75"/></svg></div><span class="text-[15px] font-semibold">LendFlow</span></a></div>
+    <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1"><p class="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest" style="color:var(--text-muted);">Overview</p>
+      <a href="admin-dashboard.html" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition" style="color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'"><svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>Dashboard</a>
+      <a href="admin-applications.html" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition" style="color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'"><svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>Applications</a>
+      <a href="admin-borrowers.html" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition" style="color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'"><svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>Borrowers</a>
+      <a href="admin-loans.html" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium" style="background:rgba(97,114,243,0.08);color:var(--brand-600);"><svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75"/></svg>Active Loans</a>
+    </nav>
+    <div class="border-t p-3" style="border-color:var(--border);"><div class="flex items-center gap-3 rounded-xl p-2"><div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white">AD</div><div class="flex-1"><p class="text-sm font-medium truncate">Admin User</p><p class="text-xs truncate" style="color:var(--text-muted);">admin@lendflow.com</p></div></div></div>
+  </aside>
+
+  <div class="flex flex-1 flex-col overflow-hidden">
+    <header class="flex h-14 items-center justify-between border-b px-6" style="background:var(--surface);border-color:var(--border);"><span class="text-sm font-medium">Active Loans</span><button @click="$store.theme.toggle()" class="rounded-xl p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button></header>
+
+    <main class="flex-1 overflow-y-auto"><div class="mx-auto max-w-[1400px] p-6 lg:p-8" x-data="{
+  loans: [], tab: 'all', loading: true,
+  async init() {
+    if (!api.isLoggedIn()) { window.location.href = 'login.html'; return; }
+    try { const res = await api.getLoans(); this.loans = res.results || []; } catch(e) { if(e?.status===401) window.location.href='login.html'; }
+    this.loading = false;
+  },
+  get filtered() {
+    if (this.tab === 'all') return this.loans;
+    return this.loans.filter(l => l.status === this.tab);
+  },
+  cnt(t) { return t === 'all' ? this.loans.length : this.loans.filter(l => l.status === t).length; },
+  get stats() {
+    const a = this.loans;
+    return {
+      total: a.length,
+      value: '$' + (a.reduce((s,l) => s + parseFloat(l.outstanding_principal||0), 0) / 1000000).toFixed(1) + 'M',
+      delinquent: a.filter(l => l.status === 'delinquent').length,
+      defaulted: a.filter(l => l.status === 'defaulted').length
+    };
+  }
+}">
+      <div class="space-y-6 animate-fade-in">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div><h1 class="text-[24px] font-bold tracking-tight" style="letter-spacing:-0.02em;">Active Loans</h1><p class="mt-1 text-sm" style="color:var(--text-muted);">Monitor all active loans across the portfolio.</p></div>
+          <button class="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition" style="border-color:var(--border);color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>Export</button>
+        </div>
+
+        <!-- Portfolio stats -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 stagger">
+          <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Total Active</p><p class="text-2xl font-bold font-tabular mt-1">412</p></div>
+          <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Portfolio Value</p><p class="text-2xl font-bold font-tabular mt-1">$18.4M</p></div>
+          <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Avg. Rate</p><p class="text-2xl font-bold font-tabular mt-1">7.2%</p></div>
+          <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Delinquent</p><p class="text-2xl font-bold font-tabular mt-1" style="color:#d97706;">37</p></div>
+          <div class="rounded-2xl border p-5 shadow-sm" style="background:var(--surface);border-color:var(--border);"><p class="text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Defaulted</p><p class="text-2xl font-bold font-tabular mt-1" style="color:#dc2626;">5</p></div>
+        </div>
+
+        <!-- Filters + Tabs -->
+        <div class="flex items-center gap-1 border-b" style="border-color:var(--border);" x-data="{ tab: 'all' }">
+          <template x-for="t in [{v:'all',l:'All',c:412},{v:'active',l:'Active',c:370},{v:'delinquent',l:'Delinquent',c:37},{v:'defaulted',l:'Defaulted',c:5}]" :key="t.v">
+            <button @click="tab=t.v" class="relative px-4 py-3 text-sm font-medium transition" :style="tab===t.v?'color:var(--brand-600);':'color:var(--text-muted);'"><span x-text="t.l"></span><span class="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold" :style="tab===t.v?'background:rgba(97,114,243,0.1);color:var(--brand-600);':'background:var(--surface-tertiary);color:var(--text-muted);'" x-text="t.c"></span><div x-show="tab===t.v" class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full"></div></button>
+          </template>
+        </div>
+
+        <!-- Table -->
+        <div class="rounded-2xl border shadow-sm overflow-hidden" style="background:var(--surface);border-color:var(--border);">
+          <div class="flex items-center gap-3 px-5 py-4 border-b" style="border-color:var(--border);">
+            <div class="relative flex-1 max-w-xs"><svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style="color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg><input type="search" placeholder="Search loans..." class="w-full rounded-lg border-0 py-2 pl-9 pr-4 text-sm ring-1 ring-inset" style="background:var(--surface-secondary);ring-color:var(--border);color:var(--text-primary);"/></div>
+            <select class="rounded-lg border-0 py-2 px-3 text-sm ring-1 ring-inset" style="background:var(--surface-secondary);ring-color:var(--border);color:var(--text-primary);"><option>All Products</option><option>Personal</option><option>Auto</option><option>Business</option></select>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead><tr style="background:var(--surface-secondary);"><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Loan ID</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Borrower</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Product</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Outstanding</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Rate</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">DPD</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Status</th><th class="px-5 py-3"></th></tr></thead>
+              <tbody class="divide-y" style="border-color:var(--border);">
+                <template x-for="l in [
+                  {id:'LN-00847',name:'John Doe',prod:'Personal',out:'$18,430',rate:'8.5%',dpd:0,status:'Active',sc:'emerald'},
+                  {id:'LN-01234',name:'John Doe',prod:'Auto',out:'$24,250',rate:'6.2%',dpd:0,status:'Active',sc:'emerald'},
+                  {id:'LN-00921',name:'Emma Brown',prod:'Personal',out:'$32,100',rate:'9.2%',dpd:0,status:'Active',sc:'emerald'},
+                  {id:'LN-01102',name:'Emma Brown',prod:'Business',out:'$24,200',rate:'5.8%',dpd:0,status:'Active',sc:'emerald'},
+                  {id:'LN-00654',name:'Tom Wilson',prod:'Personal',out:'$12,800',rate:'10.5%',dpd:15,status:'Delinquent',sc:'amber'},
+                  {id:'LN-00412',name:'Maria Santos',prod:'Auto',out:'$8,900',rate:'7.8%',dpd:45,status:'Delinquent',sc:'amber'},
+                  {id:'LN-00298',name:'James Park',prod:'Personal',out:'$15,600',rate:'12.0%',dpd:92,status:'Defaulted',sc:'red'},
+                  {id:'LN-01350',name:'Mike Chen',prod:'Personal',out:'$8,200',rate:'7.5%',dpd:0,status:'Active',sc:'emerald'}
+                ]" :key="l.id">
+                  <tr class="transition cursor-pointer" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+                    <td class="px-5 py-3.5 font-mono text-xs font-semibold" x-text="l.id"></td>
+                    <td class="px-5 py-3.5 font-medium" x-text="l.name"></td>
+                    <td class="px-5 py-3.5" style="color:var(--text-secondary);" x-text="l.prod"></td>
+                    <td class="px-5 py-3.5 font-mono font-semibold" x-text="l.out"></td>
+                    <td class="px-5 py-3.5 font-mono" style="color:var(--text-secondary);" x-text="l.rate"></td>
+                    <td class="px-5 py-3.5"><span class="font-mono font-medium" :style="l.dpd > 60 ? 'color:#dc2626;' : l.dpd > 0 ? 'color:#d97706;' : 'color:var(--text-secondary);'" x-text="l.dpd"></span></td>
+                    <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold" :class="'bg-'+l.sc+'-500/10 text-'+l.sc+'-600'" x-text="l.status"></span></td>
+                    <td class="px-5 py-3.5"><svg class="h-4 w-4" style="color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <div class="flex items-center justify-between px-5 py-3 border-t" style="border-color:var(--border);"><p class="text-xs" style="color:var(--text-muted);">Showing 1-8 of 412</p><div class="flex gap-1"><button class="rounded-lg px-3 py-1.5 text-xs font-medium" style="background:rgba(97,114,243,0.1);color:var(--brand-600);">1</button><button class="rounded-lg px-3 py-1.5 text-xs font-medium" style="color:var(--text-muted);">2</button><button class="rounded-lg px-3 py-1.5 text-xs font-medium" style="color:var(--text-muted);">3</button><span class="px-1 text-xs" style="color:var(--text-muted);">...</span><button class="rounded-lg px-3 py-1.5 text-xs font-medium" style="color:var(--text-muted);">52</button></div></div>
+        </div>
+      </div>
+    </div></main>
+  </div>
+</div>
+<script>if (!api.isLoggedIn()) window.location.href = 'login.html';</script>
+</body>
+</html>

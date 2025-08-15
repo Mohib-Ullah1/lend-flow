@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Identity · LendFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../static/css/styles.css" />
+  <script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: { brand: { 50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b' } },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="min-h-screen font-sans antialiased grain" style="background: var(--surface-secondary); color: var(--text-primary);">
+
+<div class="flex min-h-screen items-center justify-center p-6 mesh-gradient"
+     x-data="{
+       ...otpInput(6),
+       ...countdownTimer(60),
+       loading: false,
+       error: false,
+       success: false,
+       verify() {
+         if (!this.isComplete) return;
+         this.loading = true;
+         this.error = false;
+         setTimeout(() => {
+           this.loading = false;
+           // Demo: code '123456' succeeds, anything else fails
+           if (this.code === '123456') {
+             this.success = true;
+           } else {
+             this.error = true;
+             this.digits = Array(6).fill('');
+             this.$nextTick(() => {
+               this.$el.querySelector('input[data-otp]')?.focus();
+             });
+           }
+         }, 1500);
+       },
+       resend() {
+         this.start();
+         this.error = false;
+         this.digits = Array(6).fill('');
+       }
+     }">
+
+  <div class="w-full max-w-[440px] animate-fade-up">
+
+    <!-- Back -->
+    <a href="login.html" class="inline-flex items-center gap-2 text-sm font-medium mb-8 transition hover:opacity-80" style="color: var(--text-secondary);">
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+      Back to sign in
+    </a>
+
+    <!-- Card -->
+    <div class="rounded-3xl border p-8 sm:p-10 shadow-lg inner-glow" style="background: var(--surface); border-color: var(--border);">
+
+      <!-- ===== VERIFY STATE ===== -->
+      <div x-show="!success">
+        <!-- Icon -->
+        <div class="flex h-14 w-14 items-center justify-center rounded-2xl mb-6" style="background: rgba(97, 114, 243, 0.08);">
+          <svg class="h-6 w-6 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/>
+          </svg>
+        </div>
+
+        <h1 class="text-[24px] font-bold tracking-tight mb-2" style="color: var(--text-primary); letter-spacing: -0.02em;">Two-factor authentication</h1>
+        <p class="text-[15px] mb-2" style="color: var(--text-secondary);">Enter the 6-digit code from your authenticator app.</p>
+        <p class="text-[13px] mb-8" style="color: var(--text-muted);">
+          <span class="inline-flex items-center gap-1">
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+            Demo: enter <code class="px-1.5 py-0.5 rounded text-xs font-mono font-bold" style="background: var(--surface-secondary);">123456</code> to verify
+          </span>
+        </p>
+
+        <!-- OTP Input -->
+        <form @submit.prevent="verify()">
+          <div class="flex justify-center gap-2.5 sm:gap-3 mb-5">
+            <template x-for="(digit, i) in digits" :key="i">
+              <input type="text" inputmode="numeric" maxlength="1" data-otp
+                     :value="digits[i]"
+                     @input="handleInput(i, $event)"
+                     @keydown="handleKeydown(i, $event)"
+                     @paste="handlePaste($event)"
+                     @focus="$event.target.select()"
+                     :autofocus="i === 0"
+                     class="h-14 w-11 sm:h-16 sm:w-14 rounded-xl border text-center text-xl sm:text-2xl font-bold otp-input"
+                     :class="digits[i] ? 'filled' : ''"
+                     style="background: var(--surface-secondary); border-color: var(--border); color: var(--text-primary);" />
+            </template>
+          </div>
+
+          <!-- Error message -->
+          <div x-show="error" x-transition class="flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm mb-5 animate-shake"
+               style="background: rgba(239,68,68,0.06); color: #dc2626;">
+            <svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"/></svg>
+            Invalid code. Please try again.
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" :disabled="loading || !isComplete"
+                  class="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed btn-glow">
+            <span x-show="!loading">Verify</span>
+            <svg x-show="loading" x-cloak class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+          </button>
+        </form>
+
+        <!-- Resend / Timer -->
+        <div class="mt-6 text-center">
+          <div x-show="!isExpired" class="flex items-center justify-center gap-3">
+            <!-- Countdown ring -->
+            <div class="relative h-8 w-8">
+              <svg class="h-8 w-8 countdown-ring" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="var(--border)" stroke-width="2.5"/>
+                <circle cx="18" cy="18" r="15" fill="none" stroke="var(--brand-500)" stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-dasharray="94.25"
+                        :stroke-dashoffset="94.25 - (progress / 100 * 94.25)"
+                        class="transition-all duration-1000"/>
+              </svg>
+              <span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold font-tabular" style="color: var(--text-muted);" x-text="remaining"></span>
+            </div>
+            <span class="text-sm" style="color: var(--text-muted);">Resend available in <span class="font-mono font-medium" x-text="display"></span></span>
+          </div>
+
+          <button x-show="isExpired" @click="resend()" x-transition
+                  class="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+            Resend code
+          </button>
+        </div>
+
+        <!-- Alternative: backup codes -->
+        <div class="mt-8 pt-6" style="border-top: 1px solid var(--border);">
+          <p class="text-center text-sm" style="color: var(--text-muted);">
+            Lost access to your authenticator?
+            <button class="font-medium text-brand-600 hover:text-brand-700 transition" onclick="document.getElementById('backup-section').classList.toggle('hidden');">
+              Use a backup code
+            </button>
+          </p>
+
+          <!-- Backup code input (hidden by default) -->
+          <div id="backup-section" class="hidden mt-4 animate-fade-up">
+            <div class="rounded-xl p-4" style="background: var(--surface-secondary);">
+              <label class="block text-[13px] font-medium mb-1.5" style="color: var(--text-primary);">Backup code</label>
+              <div class="flex gap-2">
+                <input type="text" placeholder="XXXX-XXXX-XXXX"
+                       class="flex-1 rounded-xl border py-2.5 px-4 text-sm font-mono tracking-wider uppercase input-ring"
+                       style="background: var(--surface); border-color: var(--border); color: var(--text-primary);"
+                       onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(97,114,243,0.15)';"
+                       onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';" />
+                <button class="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">
+                  Verify
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SUCCESS STATE ===== -->
+      <div x-show="success" x-transition class="text-center">
+        <div class="flex h-16 w-16 items-center justify-center rounded-full mx-auto mb-6 animate-bounce-in" style="background: rgba(16, 185, 129, 0.1);">
+          <svg class="h-7 w-7 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 13l4 4L19 7" style="stroke-dasharray: 48; animation: checkmark-draw 0.6s ease-out 0.3s both;"/>
+          </svg>
+        </div>
+        <h2 class="text-[22px] font-bold tracking-tight mb-2" style="color: var(--text-primary); letter-spacing: -0.02em;">Verified!</h2>
+        <p class="text-[15px] mb-8" style="color: var(--text-secondary);">Your identity has been confirmed. Redirecting to your dashboard...</p>
+
+        <!-- Progress bar -->
+        <div class="h-1.5 w-full rounded-full overflow-hidden" style="background: var(--surface-secondary);">
+          <div class="h-full rounded-full bg-brand-600" style="--progress: 100%; animation: progress-fill 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;"></div>
+        </div>
+        <p class="mt-3 text-xs" style="color: var(--text-muted);">Redirecting in 2 seconds...</p>
+      </div>
+    </div>
+
+    <!-- Security footer -->
+    <div class="mt-6 flex items-center justify-center gap-2">
+      <svg class="h-4 w-4" style="color: var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+      </svg>
+      <span class="text-xs" style="color: var(--text-muted);">Secured with 256-bit encryption</span>
+    </div>
+  </div>
+</div>
+
+<!-- Theme toggle -->
+<div class="fixed bottom-6 right-6 z-50">
+  <button @click="$store.theme.toggle()" class="flex h-10 w-10 items-center justify-center rounded-xl border shadow-sm transition hover:shadow-md" style="background: var(--surface); border-color: var(--border);">
+    <svg x-show="!$store.theme.dark" class="h-4 w-4" style="color: var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+    <svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" style="color: var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+  </button>
+</div>
+
+<script>if (!api.isLoggedIn()) window.location.href = "login.html";</script>
+</body>
+</html>

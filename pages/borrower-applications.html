@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Applications · LendFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/>
+  <script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+
+<!-- Nav (reuse borrower nav) -->
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);">
+  <div class="mx-auto max-w-5xl flex items-center justify-between px-6 h-16">
+    <a href="/" class="flex items-center gap-2.5"><div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600"><svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75"/></svg></div><span class="text-base font-semibold">LendFlow</span></a>
+    <nav class="hidden sm:flex items-center gap-1">
+      <a href="borrower-dashboard.html" class="rounded-lg px-3 py-2 text-sm font-medium transition" style="color:var(--text-secondary);">Dashboard</a>
+      <a href="borrower-applications.html" class="rounded-lg px-3 py-2 text-sm font-medium text-brand-600" style="background:rgba(97,114,243,0.08);">Applications</a>
+      <a href="borrower-loan-detail.html" class="rounded-lg px-3 py-2 text-sm font-medium transition" style="color:var(--text-secondary);">Loans</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <button @click="$store.theme.toggle()" class="rounded-lg p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button>
+      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white">JD</div>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-5xl px-6 py-8" x-data="{
+  apps: [], tab: 'all', loading: true,
+  async init() {
+    if (!api.isLoggedIn()) { window.location.href = 'login.html'; return; }
+    try { const res = await api.getApplications(); this.apps = res.results || []; } catch(e) { if(e?.status===401) window.location.href='login.html'; }
+    this.loading = false;
+  },
+  get filtered() {
+    if (this.tab === 'all') return this.apps;
+    return this.apps.filter(a => a.status === this.tab);
+  },
+  statusColor(s) {
+    const m = {approved:'emerald',active:'emerald',disbursed:'violet',submitted:'blue',under_review:'amber',rejected:'red',draft:'zinc'};
+    return m[s] || 'zinc';
+  },
+  countByStatus(s) { return s === 'all' ? this.apps.length : this.apps.filter(a => a.status === s).length; }
+}">
+  <div class="space-y-6 animate-fade-in">
+    <!-- Header -->
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-[24px] font-bold tracking-tight" style="letter-spacing:-0.02em;">My Applications</h1>
+        <p class="mt-1 text-sm" style="color:var(--text-muted);">Track the status of all your loan applications.</p>
+      </div>
+      <a href="borrower-apply.html" class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 btn-glow">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        New Application
+      </a>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="flex items-center gap-1 border-b" style="border-color:var(--border);">
+      <template x-for="t in [{v:'all',l:'All'},{v:'approved',l:'Approved'},{v:'under_review',l:'Under Review'},{v:'disbursed',l:'Disbursed'},{v:'rejected',l:'Rejected'}]" :key="t.v">
+        <button @click="tab = t.v" class="relative px-4 py-3 text-sm font-medium transition"
+                :style="tab===t.v ? 'color:var(--brand-600);' : 'color:var(--text-muted);'">
+          <span x-text="t.l"></span>
+          <span class="ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold" :style="tab===t.v ? 'background:rgba(97,114,243,0.1);color:var(--brand-600);' : 'background:var(--surface-tertiary);color:var(--text-muted);'" x-text="countByStatus(t.v)"></span>
+          <div x-show="tab===t.v" class="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-600 rounded-full"></div>
+        </button>
+      </template>
+    </div>
+
+    <!-- Applications table -->
+    <div class="rounded-2xl border shadow-sm overflow-hidden" style="background:var(--surface);border-color:var(--border);">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr style="background:var(--surface-secondary);">
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Application</th>
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Type</th>
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Amount</th>
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Term</th>
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Status</th>
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Submitted</th>
+            <th class="px-5 py-3"></th>
+          </tr></thead>
+          <tbody class="divide-y" style="border-color:var(--border);">
+            <!-- Loading -->
+            <tr x-show="loading"><td colspan="7" class="px-5 py-8 text-center text-sm" style="color:var(--text-muted);">Loading...</td></tr>
+            <!-- Empty -->
+            <tr x-show="!loading && !filtered.length"><td colspan="7" class="px-5 py-8 text-center text-sm" style="color:var(--text-muted);">No applications found.</td></tr>
+            <!-- Dynamic rows -->
+            <template x-for="a in filtered" :key="a.id">
+              <tr class="transition cursor-pointer" @click="location.href='borrower-application-detail.html?id='+a.id" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+                <td class="px-5 py-4"><p class="font-semibold text-sm" x-text="'APP-'+a.id.substring(0,8)"></p></td>
+                <td class="px-5 py-4" style="color:var(--text-secondary);" x-text="a.product_name || 'Loan'"></td>
+                <td class="px-5 py-4 font-mono font-medium" x-text="'$'+parseFloat(a.amount_requested).toLocaleString()"></td>
+                <td class="px-5 py-4" style="color:var(--text-secondary);" x-text="a.term_months+' mo'"></td>
+                <td class="px-5 py-4"><span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide" :class="'bg-'+statusColor(a.status)+'-500/10 text-'+statusColor(a.status)+'-600'"><span class="h-1.5 w-1.5 rounded-full" :class="'bg-'+statusColor(a.status)+'-500'"></span><span x-text="a.status.replace('_',' ')"></span></span></td>
+                <td class="px-5 py-4 text-sm" style="color:var(--text-muted);" x-text="a.submitted_at ? new Date(a.submitted_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'"></td>
+                <td class="px-5 py-4"><svg class="h-4 w-4" style="color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

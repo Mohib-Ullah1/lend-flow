@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Webhooks · LendFlow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/><script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);"><div class="mx-auto max-w-5xl flex items-center justify-between px-6 h-14"><a href="admin-settings.html" class="flex items-center gap-2 text-sm font-medium" style="color:var(--text-secondary);"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>Settings</a><button @click="$store.theme.toggle()" class="rounded-lg p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button></div></header>
+
+<main class="mx-auto max-w-5xl px-6 py-8" x-data="{ showAdd: false, testSent: false }">
+  <div class="space-y-6 animate-fade-in">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div><h1 class="text-[24px] font-bold tracking-tight" style="letter-spacing:-0.02em;">Webhooks</h1><p class="mt-1 text-sm" style="color:var(--text-muted);">Send real-time event notifications to your systems.</p></div>
+      <button @click="showAdd=true" class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 btn-glow"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>Add Webhook</button>
+    </div>
+
+    <!-- Webhook cards -->
+    <div class="space-y-4 stagger">
+      <template x-for="wh in [
+        {name:'Application Events',url:'https://api.firstnational.com/webhooks/applications',events:['loan.submitted','loan.approved','loan.rejected','loan.disbursed'],active:true,lastDelivery:'2 min ago',successRate:'100%'},
+        {name:'Payment Events',url:'https://api.firstnational.com/webhooks/payments',events:['payment.received','payment.failed','payment.reversed'],active:true,lastDelivery:'15 min ago',successRate:'99.8%'},
+        {name:'KYC Events',url:'https://api.firstnational.com/webhooks/kyc',events:['kyc.completed','kyc.rejected'],active:false,lastDelivery:'3 days ago',successRate:'97.2%'}
+      ]" :key="wh.name">
+        <div class="rounded-2xl border shadow-sm" style="background:var(--surface);border-color:var(--border);">
+          <div class="flex items-center justify-between p-5 border-b" style="border-color:var(--border);">
+            <div class="flex items-center gap-3">
+              <div class="flex h-9 w-9 items-center justify-center rounded-lg" style="background:rgba(97,114,243,0.08);"><svg class="h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg></div>
+              <div><p class="text-sm font-semibold" x-text="wh.name"></p><p class="text-xs font-mono mt-0.5" style="color:var(--text-muted);" x-text="wh.url"></p></div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-semibold" :style="wh.active?'background:rgba(16,185,129,0.1);color:#059669;':'background:var(--surface-tertiary);color:var(--text-muted);'" x-text="wh.active?'Active':'Paused'"></span>
+              <button class="text-xs font-medium text-brand-600 hover:text-brand-700 transition">Edit</button>
+            </div>
+          </div>
+          <div class="p-5">
+            <div class="flex flex-wrap gap-1.5 mb-4">
+              <template x-for="ev in wh.events" :key="ev"><span class="rounded px-2 py-0.5 text-[10px] font-mono font-medium" style="background:var(--surface-tertiary);color:var(--text-muted);" x-text="ev"></span></template>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4 text-xs" style="color:var(--text-muted);"><span>Last: <span class="font-medium" x-text="wh.lastDelivery"></span></span><span>Success: <span class="font-medium" :class="wh.successRate==='100%'?'text-emerald-600':''" x-text="wh.successRate"></span></span></div>
+              <button @click="testSent=true; setTimeout(()=>testSent=false,2000);" class="rounded-lg px-3 py-1.5 text-xs font-medium transition" style="color:var(--text-secondary);background:var(--surface-secondary);" onmouseover="this.style.background='var(--surface-tertiary)'" onmouseout="this.style.background='var(--surface-secondary)'">Send Test</button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Recent deliveries -->
+    <div class="rounded-2xl border shadow-sm overflow-hidden" style="background:var(--surface);border-color:var(--border);">
+      <div class="px-5 py-4 border-b" style="border-color:var(--border);"><h3 class="text-sm font-semibold">Recent Deliveries</h3></div>
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr style="background:var(--surface-secondary);"><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Event</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Endpoint</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Status</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Response</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Time</th></tr></thead>
+        <tbody class="divide-y" style="border-color:var(--border);">
+          <template x-for="d in [
+            {event:'loan.approved',endpoint:'…/applications',status:200,time:'2m ago'},
+            {event:'payment.received',endpoint:'…/payments',status:200,time:'15m ago'},
+            {event:'loan.submitted',endpoint:'…/applications',status:200,time:'22m ago'},
+            {event:'loan.disbursed',endpoint:'…/applications',status:200,time:'1h ago'},
+            {event:'payment.received',endpoint:'…/payments',status:200,time:'2h ago'},
+            {event:'payment.failed',endpoint:'…/payments',status:500,time:'3h ago'}
+          ]" :key="d.event+d.time">
+            <tr class="transition" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+              <td class="px-5 py-3 font-mono text-xs font-medium" x-text="d.event"></td>
+              <td class="px-5 py-3 font-mono text-xs" style="color:var(--text-muted);" x-text="d.endpoint"></td>
+              <td class="px-5 py-3"><span class="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-bold font-mono" :style="d.status===200?'background:rgba(16,185,129,0.1);color:#059669;':'background:rgba(239,68,68,0.1);color:#dc2626;'" x-text="d.status"></span></td>
+              <td class="px-5 py-3 text-xs" style="color:var(--text-muted);" x-text="d.status===200?'OK':'Internal Server Error'"></td>
+              <td class="px-5 py-3 text-xs" style="color:var(--text-muted);" x-text="d.time"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- Test sent toast -->
+  <div x-show="testSent" x-transition class="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl border px-5 py-4 shadow-lg" style="background:var(--surface);border-color:var(--border);"><svg class="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg><span class="text-sm font-medium">Test webhook sent! Response: 200 OK</span></div>
+
+  <!-- Add modal -->
+  <div x-show="showAdd" x-cloak class="fixed inset-0 z-50"><div x-transition.opacity class="fixed inset-0 bg-black/40 backdrop-blur-sm" @click="showAdd=false"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div x-show="showAdd" x-transition class="w-full max-w-md rounded-3xl border p-8 shadow-lg" style="background:var(--surface);border-color:var(--border);"><h3 class="text-lg font-semibold mb-1">Add Webhook</h3><p class="text-sm mb-6" style="color:var(--text-secondary);">Configure a new webhook endpoint.</p>
+    <div class="space-y-4 mb-6">
+      <div><label class="block text-[13px] font-medium mb-1.5">Name</label><input type="text" placeholder="My Webhook" class="w-full rounded-xl border py-2.5 px-4 text-sm" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div>
+      <div><label class="block text-[13px] font-medium mb-1.5">Endpoint URL</label><input type="url" placeholder="https://api.example.com/webhooks" class="w-full rounded-xl border py-2.5 px-4 text-sm font-mono" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div>
+      <div><label class="block text-[13px] font-medium mb-1.5">Secret (for signature verification)</label><input type="text" placeholder="whsec_..." class="w-full rounded-xl border py-2.5 px-4 text-sm font-mono" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div>
+      <div><label class="block text-[13px] font-medium mb-2">Events</label>
+        <div class="grid grid-cols-2 gap-2">
+          <template x-for="ev in ['loan.submitted','loan.approved','loan.rejected','loan.disbursed','payment.received','payment.failed','kyc.completed','kyc.rejected']" :key="ev"><label class="flex items-center gap-2"><input type="checkbox" class="h-3.5 w-3.5 rounded border text-brand-600" style="border-color:var(--border-strong);"/><span class="text-xs font-mono" x-text="ev"></span></label></template>
+        </div>
+      </div>
+    </div>
+    <div class="flex gap-3"><button @click="showAdd=false" class="flex-1 rounded-xl border py-3 text-sm font-medium" style="border-color:var(--border);color:var(--text-secondary);">Cancel</button><button @click="showAdd=false" class="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Create Webhook</button></div>
+  </div></div></div>
+</main>
+<script>if (!api.isLoggedIn()) window.location.href = "login.html";</script>
+</body>
+</html>

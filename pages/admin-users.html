@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Team Management · LendFlow Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/><script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);"><div class="mx-auto max-w-5xl flex items-center justify-between px-6 h-14"><a href="admin-settings.html" class="flex items-center gap-2 text-sm font-medium" style="color:var(--text-secondary);"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>Settings</a><button @click="$store.theme.toggle()" class="rounded-lg p-2" style="color:var(--text-muted);"><svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg><svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg></button></div></header>
+
+<main class="mx-auto max-w-5xl px-6 py-8" x-data="{ showInvite: false }">
+  <div class="space-y-6 animate-fade-in">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div><h1 class="text-[24px] font-bold tracking-tight" style="letter-spacing:-0.02em;">Team Management</h1><p class="mt-1 text-sm" style="color:var(--text-muted);">Manage team members, roles, and permissions.</p></div>
+      <button @click="showInvite=true" class="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 btn-glow"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>Invite Member</button>
+    </div>
+
+    <!-- Roles summary -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 stagger">
+      <template x-for="r in [{role:'Admin',count:1,color:'brand'},{role:'Sr. Underwriter',count:2,color:'emerald'},{role:'Jr. Underwriter',count:3,color:'blue'},{role:'Collections',count:2,color:'amber'},{role:'Analyst',count:1,color:'violet'}]" :key="r.role">
+        <div class="rounded-xl border p-4 text-center" style="background:var(--surface);border-color:var(--border);">
+          <p class="text-xl font-bold font-tabular" x-text="r.count"></p>
+          <p class="text-xs font-medium mt-0.5" style="color:var(--text-muted);" x-text="r.role"></p>
+        </div>
+      </template>
+    </div>
+
+    <!-- Team table -->
+    <div class="rounded-2xl border shadow-sm overflow-hidden" style="background:var(--surface);border-color:var(--border);">
+      <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr style="background:var(--surface-secondary);"><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Member</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Role</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">MFA</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Last Active</th><th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Status</th><th class="px-5 py-3"></th></tr></thead>
+        <tbody class="divide-y" style="border-color:var(--border);">
+          <template x-for="u in [
+            {name:'Admin User',email:'admin@lendflow.com',init:'AD',role:'Institution Admin',mfa:true,last:'Active now',active:true},
+            {name:'Jane Smith',email:'jane@lendflow.com',init:'JS',role:'Senior Underwriter',mfa:true,last:'2 hours ago',active:true},
+            {name:'Robert Kim',email:'robert@lendflow.com',init:'RK',role:'Senior Underwriter',mfa:true,last:'1 day ago',active:true},
+            {name:'Mike Rodriguez',email:'mike@lendflow.com',init:'MR',role:'Junior Underwriter',mfa:true,last:'3 hours ago',active:true},
+            {name:'Lisa Chen',email:'lisa@lendflow.com',init:'LC',role:'Junior Underwriter',mfa:false,last:'5 hours ago',active:true},
+            {name:'David Park',email:'david@lendflow.com',init:'DP',role:'Junior Underwriter',mfa:true,last:'1 day ago',active:true},
+            {name:'Sarah Lee',email:'sarah@lendflow.com',init:'SL',role:'Collections Agent',mfa:true,last:'Active now',active:true},
+            {name:'Carlos Ruiz',email:'carlos@lendflow.com',init:'CR',role:'Collections Agent',mfa:true,last:'4 hours ago',active:true},
+            {name:'Tom Brown',email:'tom@lendflow.com',init:'TB',role:'Analyst',mfa:false,last:'3 days ago',active:false}
+          ]" :key="u.email">
+            <tr class="transition" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+              <td class="px-5 py-3.5"><div class="flex items-center gap-3"><div class="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold" :style="u.active ? 'background: linear-gradient(135deg, var(--brand-400, #8098f9), var(--brand-600, #444ce7)); color: white;' : 'background:var(--surface-tertiary);color:var(--text-muted);'" x-text="u.init"></div><div><p class="text-sm font-medium" x-text="u.name"></p><p class="text-xs" style="color:var(--text-muted);" x-text="u.email"></p></div></div></td>
+              <td class="px-5 py-3.5"><span class="text-xs font-medium" style="color:var(--text-secondary);" x-text="u.role"></span></td>
+              <td class="px-5 py-3.5"><span x-show="u.mfa" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600"><svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg>Enabled</span><span x-show="!u.mfa" class="inline-flex items-center gap-1 text-[11px] font-semibold" style="color:#d97706;"><svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"/></svg>Disabled</span></td>
+              <td class="px-5 py-3.5 text-xs" :style="u.last==='Active now'?'color:#059669;font-weight:600;':'color:var(--text-muted);'" x-text="u.last"></td>
+              <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[10px] font-semibold" :style="u.active?'background:rgba(16,185,129,0.1);color:#059669;':'background:var(--surface-tertiary);color:var(--text-muted);'" x-text="u.active?'Active':'Inactive'"></span></td>
+              <td class="px-5 py-3.5"><button class="rounded-lg p-1.5 transition" style="color:var(--text-muted);" onmouseover="this.style.background='var(--surface-tertiary)'" onmouseout="this.style.background='transparent'"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg></button></td>
+            </tr>
+          </template>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- Invite modal -->
+  <div x-show="showInvite" x-cloak class="fixed inset-0 z-50"><div x-transition.opacity class="fixed inset-0 bg-black/40 backdrop-blur-sm" @click="showInvite=false"></div><div class="fixed inset-0 flex items-center justify-center p-4"><div x-show="showInvite" x-transition class="w-full max-w-md rounded-3xl border p-8 shadow-lg" style="background:var(--surface);border-color:var(--border);"><h3 class="text-lg font-semibold mb-1">Invite Team Member</h3><p class="text-sm mb-6" style="color:var(--text-secondary);">They'll receive an email invitation to join your institution.</p>
+    <div class="space-y-4 mb-6">
+      <div class="grid grid-cols-2 gap-3"><div><label class="block text-[13px] font-medium mb-1.5">First name</label><input type="text" placeholder="Jane" class="w-full rounded-xl border py-2.5 px-4 text-sm" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div><div><label class="block text-[13px] font-medium mb-1.5">Last name</label><input type="text" placeholder="Smith" class="w-full rounded-xl border py-2.5 px-4 text-sm" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div></div>
+      <div><label class="block text-[13px] font-medium mb-1.5">Email</label><input type="email" placeholder="jane@company.com" class="w-full rounded-xl border py-2.5 px-4 text-sm" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"/></div>
+      <div><label class="block text-[13px] font-medium mb-1.5">Role</label><select class="w-full rounded-xl border py-2.5 px-4 text-sm" style="background:var(--surface-secondary);border-color:var(--border);color:var(--text-primary);"><option>Junior Underwriter</option><option>Senior Underwriter</option><option>Collections Agent</option><option>Analyst</option><option>Institution Admin</option></select></div>
+    </div>
+    <div class="flex gap-3"><button @click="showInvite=false" class="flex-1 rounded-xl border py-3 text-sm font-medium" style="border-color:var(--border);color:var(--text-secondary);">Cancel</button><button @click="showInvite=false" class="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Send Invitation</button></div>
+  </div></div></div>
+</main>
+<script>if (!api.isLoggedIn()) window.location.href = 'login.html';</script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In · LendFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../static/css/styles.css" />
+  <script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',
+              400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',
+              800:'#2d31a6',900:'#2b2f83',950:'#1f235b'
+            },
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="min-h-screen font-sans antialiased grain" style="background: var(--surface-secondary); color: var(--text-primary);">
+
+<div class="flex min-h-screen">
+
+  <!-- ============================================
+       LEFT: CINEMATIC MESH GRADIENT
+       ============================================ -->
+  <div class="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden">
+    <!-- Animated gradient background -->
+    <div class="auth-mesh absolute inset-0"></div>
+    <div class="absolute inset-0 bg-black/10"></div>
+
+    <!-- Content -->
+    <div class="relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full">
+      <!-- Logo -->
+      <div>
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm border border-white/10 transition group-hover:bg-white/30">
+            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+            </svg>
+          </div>
+          <span class="text-xl font-semibold text-white">LendFlow</span>
+        </a>
+      </div>
+
+      <!-- Testimonial -->
+      <div class="max-w-lg animate-fade-up" style="animation-delay: 200ms;">
+        <div class="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-1.5 mb-6">
+          <svg class="h-4 w-4 text-emerald-300" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"/></svg>
+          <span class="text-sm font-medium text-white/80">Trusted by 200+ institutions</span>
+        </div>
+        <blockquote class="text-[28px] leading-[1.35] font-medium text-white/95" style="text-wrap: balance;">
+          "LendFlow reduced our loan processing time from 5 days to under 30 minutes. It's transformed our operations."
+        </blockquote>
+        <div class="mt-8 flex items-center gap-4">
+          <div class="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white font-semibold text-sm">SC</div>
+          <div>
+            <p class="text-[15px] font-semibold text-white">Sarah Chen</p>
+            <p class="text-sm text-white/50">VP of Operations · First National Bank</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats strip -->
+      <div class="flex gap-10 animate-fade-up" style="animation-delay: 400ms;">
+        <div>
+          <p class="text-3xl font-bold text-white font-tabular">$2.4B</p>
+          <p class="text-[13px] text-white/50 mt-0.5">Loans Processed</p>
+        </div>
+        <div>
+          <p class="text-3xl font-bold text-white font-tabular">8,000+</p>
+          <p class="text-[13px] text-white/50 mt-0.5">Monthly Applications</p>
+        </div>
+        <div>
+          <p class="text-3xl font-bold text-white font-tabular">99.9%</p>
+          <p class="text-[13px] text-white/50 mt-0.5">Uptime SLA</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating glass cards -->
+    <div class="absolute right-10 top-[22%] h-52 w-72 rounded-3xl bg-white/[0.07] backdrop-blur-md border border-white/10 p-6 rotate-6 animate-float pointer-events-none">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="h-8 w-8 rounded-lg bg-white/15"></div>
+        <div>
+          <div class="h-3 w-20 rounded bg-white/15 mb-1.5"></div>
+          <div class="h-2 w-14 rounded bg-white/10"></div>
+        </div>
+      </div>
+      <div class="h-7 w-28 rounded-lg bg-white/15 mb-4"></div>
+      <div class="space-y-2">
+        <div class="h-2 w-full rounded bg-white/8"></div>
+        <div class="h-2 w-4/5 rounded bg-white/8"></div>
+        <div class="h-2 w-3/5 rounded bg-white/8"></div>
+      </div>
+    </div>
+
+    <div class="absolute right-28 bottom-[22%] h-40 w-56 rounded-3xl bg-white/[0.07] backdrop-blur-md border border-white/10 p-5 -rotate-3 animate-float-delayed pointer-events-none">
+      <div class="h-3 w-16 rounded bg-white/15 mb-3"></div>
+      <div class="h-6 w-24 rounded bg-emerald-400/20 mb-4"></div>
+      <div class="flex gap-2">
+        <div class="h-8 w-8 rounded-full bg-white/10"></div>
+        <div class="h-8 w-8 rounded-full bg-white/10"></div>
+        <div class="h-8 w-8 rounded-full bg-white/10"></div>
+        <div class="h-8 w-8 rounded-full bg-white/10"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       RIGHT: LOGIN FORM
+       ============================================ -->
+  <div class="flex flex-1 flex-col justify-center px-6 py-12 lg:px-12 xl:px-20" style="background: var(--surface);">
+    <div class="mx-auto w-full max-w-[400px] animate-fade-up">
+
+      <!-- Mobile logo -->
+      <div class="mb-10 lg:hidden">
+        <a href="/" class="flex items-center gap-2.5">
+          <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600">
+            <svg class="h-4.5 w-4.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+            </svg>
+          </div>
+          <span class="text-lg font-semibold" style="color: var(--text-primary);">LendFlow</span>
+        </a>
+      </div>
+
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-[28px] font-bold tracking-tight" style="color: var(--text-primary); letter-spacing: -0.03em;">Welcome back</h1>
+        <p class="mt-2 text-[15px]" style="color: var(--text-secondary);">Sign in to your account to continue.</p>
+      </div>
+
+      <!-- Form -->
+      <form class="space-y-5" x-data="{ showPassword: false, loading: false, error: false, errorMsg: '', username: '', password: '' }" @submit.prevent="
+        loading = true; error = false;
+        api.login(username, password).then(user => {
+          loading = false;
+          const dest = user.role === 'borrower' ? 'borrower-dashboard.html' : 'admin-dashboard.html';
+          window.location.href = dest;
+        }).catch(err => {
+          loading = false; error = true;
+          errorMsg = err?.data?.detail || 'Invalid credentials.';
+        });
+      ">
+
+        <!-- Username/Email -->
+        <div>
+          <label class="block text-[13px] font-medium mb-1.5" style="color: var(--text-primary);">Username or Email</label>
+          <input type="text" required autocomplete="username" x-model="username"
+                 placeholder="admin"
+                 class="w-full rounded-xl border py-3 px-4 text-sm input-ring"
+                 style="background: var(--surface-secondary); border-color: var(--border); color: var(--text-primary);"
+                 onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(97,114,243,0.15)'; this.style.background='var(--surface)';"
+                 onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none'; this.style.background='var(--surface-secondary)';" />
+        </div>
+
+        <!-- Password -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-[13px] font-medium" style="color: var(--text-primary);">Password</label>
+            <a href="forgot-password.html" class="text-[13px] font-medium text-brand-600 hover:text-brand-700 transition">Forgot?</a>
+          </div>
+          <div class="relative">
+            <input :type="showPassword ? 'text' : 'password'" required autocomplete="current-password" x-model="password"
+                   placeholder="Enter your password"
+                   class="w-full rounded-xl border py-3 px-4 pr-11 text-sm input-ring"
+                   style="background: var(--surface-secondary); border-color: var(--border); color: var(--text-primary);"
+                   onfocus="this.style.borderColor='var(--brand-500)'; this.style.boxShadow='0 0 0 3px rgba(97,114,243,0.15)'; this.style.background='var(--surface)';"
+                   onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none'; this.style.background='var(--surface-secondary)';" />
+            <button type="button" @click="showPassword = !showPassword"
+                    class="absolute right-3.5 top-1/2 -translate-y-1/2 transition" style="color: var(--text-muted);">
+              <!-- Eye open -->
+              <svg x-show="!showPassword" class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <!-- Eye closed -->
+              <svg x-show="showPassword" x-cloak class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember me -->
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="remember" class="h-4 w-4 rounded border text-brand-600 focus:ring-brand-500 focus:ring-offset-0"
+                 style="border-color: var(--border-strong);" />
+          <label for="remember" class="text-sm" style="color: var(--text-secondary);">Remember me for 30 days</label>
+        </div>
+
+        <!-- Error message (demo: click to toggle) -->
+        <div x-show="error" x-transition class="flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm animate-shake"
+             style="background: rgba(239,68,68,0.06); color: #dc2626;">
+          <svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"/>
+          </svg>
+          <span x-text="errorMsg || 'Invalid credentials. Please try again.'"></span>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit"
+                :disabled="loading"
+                class="relative flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed btn-glow"
+                style="focus-ring-offset-color: var(--surface);">
+          <span x-show="!loading">Sign in</span>
+          <svg x-show="!loading" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+          </svg>
+          <!-- Loading spinner -->
+          <svg x-show="loading" x-cloak class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"/>
+            <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </form>
+
+      <!-- Divider -->
+      <div class="my-7 flex items-center gap-4">
+        <div class="h-px flex-1" style="background: var(--border);"></div>
+        <span class="text-xs font-medium" style="color: var(--text-muted);">or continue with</span>
+        <div class="h-px flex-1" style="background: var(--border);"></div>
+      </div>
+
+      <!-- Social Login -->
+      <div class="grid grid-cols-2 gap-3">
+        <button class="flex items-center justify-center gap-2.5 rounded-xl border px-4 py-2.5 text-sm font-medium social-btn"
+                style="background: var(--surface); border-color: var(--border); color: var(--text-primary);">
+          <svg class="h-4 w-4" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Google
+        </button>
+        <button class="flex items-center justify-center gap-2.5 rounded-xl border px-4 py-2.5 text-sm font-medium social-btn"
+                style="background: var(--surface); border-color: var(--border); color: var(--text-primary);">
+          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
+          GitHub
+        </button>
+      </div>
+
+      <!-- Register link -->
+      <p class="mt-8 text-center text-sm" style="color: var(--text-muted);">
+        Don't have an account?
+        <a href="register.html" class="font-semibold text-brand-600 hover:text-brand-700 transition">Create one</a>
+      </p>
+
+      <!-- Theme toggle (bottom-right) -->
+      <div class="fixed bottom-6 right-6">
+        <button @click="$store.theme.toggle()"
+                class="flex h-10 w-10 items-center justify-center rounded-xl border shadow-sm transition hover:shadow-md"
+                style="background: var(--surface); border-color: var(--border);">
+          <svg x-show="!$store.theme.dark" class="h-4 w-4" style="color: var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
+          </svg>
+          <svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" style="color: var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

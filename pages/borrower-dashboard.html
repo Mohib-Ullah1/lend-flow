@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" x-data x-bind:class="{ 'dark': $store.theme.dark }">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard · LendFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/css/styles.css"/>
+  <script src="../static/js/app.js"></script>
+  <script src="../static/js/api.js"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']},colors:{brand:{50:'#f0f5ff',100:'#e0eaff',200:'#c7d7fe',300:'#a4bcfd',400:'#8098f9',500:'#6172f3',600:'#444ce7',700:'#3538cd',800:'#2d31a6',900:'#2b2f83',950:'#1f235b'}}}}}</script>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background:var(--surface-secondary);color:var(--text-primary);">
+
+<!-- Borrower top nav -->
+<header class="sticky top-0 z-30 border-b backdrop-blur-sm" style="background:var(--surface-glass);border-color:var(--border);">
+  <div class="mx-auto max-w-5xl flex items-center justify-between px-6 h-16">
+    <a href="/" class="flex items-center gap-2.5">
+      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600"><svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg></div>
+      <span class="text-base font-semibold">LendFlow</span>
+    </a>
+    <nav class="hidden sm:flex items-center gap-1">
+      <a href="borrower-dashboard.html" class="rounded-lg px-3 py-2 text-sm font-medium text-brand-600" style="background:rgba(97,114,243,0.08);">Dashboard</a>
+      <a href="borrower-applications.html" class="rounded-lg px-3 py-2 text-sm font-medium transition" style="color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">Applications</a>
+      <a href="borrower-loan-detail.html" class="rounded-lg px-3 py-2 text-sm font-medium transition" style="color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">Loans</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <button @click="$store.theme.toggle()" class="rounded-lg p-2 transition" style="color:var(--text-muted);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+        <svg x-show="!$store.theme.dark" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+        <svg x-show="$store.theme.dark" x-cloak class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+      </button>
+      <div @click="api.logout()" class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-xs font-bold text-white cursor-pointer" x-text="initials || 'JD'" title="Logout"></div>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-5xl px-6 py-8" x-data="dashboardData()">
+  <div class="space-y-8 animate-fade-in">
+
+    <!-- Hero card -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800 p-8 text-white">
+      <div class="relative z-10">
+        <p class="text-sm font-medium text-white/60" x-text="greeting + ','"></p>
+        <h1 class="mt-1 text-[28px] font-bold tracking-tight" style="letter-spacing:-0.03em;" x-text="user.first_name + ' ' + (user.last_name || '')"></h1>
+        <div class="mt-5 inline-flex items-center gap-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 px-5 py-3.5">
+          <div>
+            <p class="text-[11px] font-medium text-white/50 uppercase tracking-wider">Next Payment</p>
+            <p class="text-xl font-bold font-tabular mt-0.5">$1,247.50</p>
+          </div>
+          <div class="h-10 w-px bg-white/15"></div>
+          <div>
+            <p class="text-[11px] font-medium text-white/50 uppercase tracking-wider">Due Date</p>
+            <p class="text-sm font-semibold mt-1">Apr 15, 2026</p>
+          </div>
+          <button class="ml-3 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-white/90 active:scale-[0.98]">Pay Now</button>
+        </div>
+      </div>
+      <div class="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/5"></div>
+      <div class="absolute -bottom-8 right-24 h-32 w-32 rounded-full bg-white/5"></div>
+      <div class="absolute right-1/3 top-2 h-20 w-20 rounded-full bg-white/[0.03]"></div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 stagger">
+      <!-- Active Loans -->
+      <div class="rounded-2xl border p-5 shadow-sm card-lift" style="background:var(--surface);border-color:var(--border);">
+        <p class="text-[13px] font-medium" style="color:var(--text-secondary);">Active Loans</p>
+        <p class="text-[28px] font-bold tracking-tight mt-1 font-tabular">2</p>
+      </div>
+      <!-- Outstanding -->
+      <div class="rounded-2xl border p-5 shadow-sm card-lift" style="background:var(--surface);border-color:var(--border);">
+        <p class="text-[13px] font-medium" style="color:var(--text-secondary);">Outstanding Balance</p>
+        <p class="text-[28px] font-bold tracking-tight mt-1 font-tabular">$42,680</p>
+        <span class="inline-flex items-center gap-1 mt-1.5 text-xs font-semibold" style="color:#ef4444;">
+          <svg class="h-3 w-3 rotate-180" viewBox="0 0 12 12" fill="none"><path d="M6 2.5v7M6 2.5L2.5 6M6 2.5L9.5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          -$1,247
+        </span>
+      </div>
+      <!-- Credit Score -->
+      <div class="rounded-2xl border p-5 shadow-sm card-lift" style="background:var(--surface);border-color:var(--border);">
+        <p class="text-[13px] font-medium" style="color:var(--text-secondary);">Credit Score</p>
+        <p class="text-[28px] font-bold tracking-tight mt-1 font-tabular">742</p>
+        <span class="inline-flex items-center gap-1 mt-1.5 text-xs font-semibold text-emerald-500">
+          <svg class="h-3 w-3" viewBox="0 0 12 12" fill="none"><path d="M6 2.5v7M6 2.5L2.5 6M6 2.5L9.5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          +12 pts
+        </span>
+      </div>
+      <!-- Payments Made -->
+      <div class="rounded-2xl border p-5 shadow-sm card-lift" style="background:var(--surface);border-color:var(--border);">
+        <p class="text-[13px] font-medium" style="color:var(--text-secondary);">Payments Made</p>
+        <p class="text-[28px] font-bold tracking-tight mt-1 font-tabular">18</p>
+        <span class="text-xs mt-1.5" style="color:var(--text-muted);">All on time</span>
+      </div>
+    </div>
+
+    <!-- Two column -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <!-- Active Loans (2/3) -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold" style="letter-spacing:-0.01em;">Your Loans</h2>
+          <a href="borrower-loan-detail.html" class="text-sm font-medium text-brand-600 hover:text-brand-700 transition">View all</a>
+        </div>
+
+        <!-- Loan card 1 -->
+        <div class="rounded-2xl border p-5 shadow-sm card-lift" style="background:var(--surface);border-color:var(--border);">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <p class="text-sm font-semibold">Personal Loan</p>
+              <p class="text-xs mt-0.5" style="color:var(--text-muted);">LN-2024-00847</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold uppercase tracking-wide" style="background:rgba(16,185,129,0.1);color:#059669;">
+              <span class="relative flex h-1.5 w-1.5"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span></span>
+              Active
+            </span>
+          </div>
+          <div class="flex items-center gap-5">
+            <!-- Progress ring -->
+            <div class="relative h-16 w-16 flex-shrink-0">
+              <svg class="h-16 w-16" viewBox="0 0 64 64" style="transform:rotate(-90deg);">
+                <circle cx="32" cy="32" r="28" fill="none" stroke="var(--border)" stroke-width="4"/>
+                <circle cx="32" cy="32" r="28" fill="none" stroke="var(--brand-500)" stroke-width="4" stroke-dasharray="175.93" stroke-dashoffset="52.78" stroke-linecap="round" style="transition:stroke-dashoffset 1s;"/>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center"><span class="text-xs font-bold font-tabular">70%</span></div>
+            </div>
+            <div class="flex-1 space-y-1.5">
+              <div class="flex justify-between text-sm"><span style="color:var(--text-muted);">Outstanding</span><span class="font-semibold font-mono">$18,430</span></div>
+              <div class="flex justify-between text-sm"><span style="color:var(--text-muted);">Principal</span><span class="font-medium font-mono" style="color:var(--text-secondary);">$25,000</span></div>
+              <div class="flex justify-between text-sm"><span style="color:var(--text-muted);">Rate</span><span class="font-medium font-mono" style="color:var(--text-secondary);">8.5% APR</span></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between rounded-xl mt-4 p-3" style="background:var(--surface-secondary);">
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Next Payment</p><p class="text-sm font-semibold font-mono mt-0.5">$847.50</p></div>
+            <div class="text-right"><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Due</p><p class="text-sm font-medium mt-0.5">Apr 15</p></div>
+          </div>
+        </div>
+
+        <!-- Loan card 2 -->
+        <div class="rounded-2xl border p-5 shadow-sm card-lift" style="background:var(--surface);border-color:var(--border);">
+          <div class="flex items-start justify-between mb-4">
+            <div><p class="text-sm font-semibold">Auto Loan</p><p class="text-xs mt-0.5" style="color:var(--text-muted);">LN-2025-01234</p></div>
+            <span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold uppercase tracking-wide" style="background:rgba(16,185,129,0.1);color:#059669;">
+              <span class="relative flex h-1.5 w-1.5"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span></span>
+              Active
+            </span>
+          </div>
+          <div class="flex items-center gap-5">
+            <div class="relative h-16 w-16 flex-shrink-0">
+              <svg class="h-16 w-16" viewBox="0 0 64 64" style="transform:rotate(-90deg);"><circle cx="32" cy="32" r="28" fill="none" stroke="var(--border)" stroke-width="4"/><circle cx="32" cy="32" r="28" fill="none" stroke="var(--brand-500)" stroke-width="4" stroke-dasharray="175.93" stroke-dashoffset="140.74" stroke-linecap="round" style="transition:stroke-dashoffset 1s;"/></svg>
+              <div class="absolute inset-0 flex items-center justify-center"><span class="text-xs font-bold font-tabular">20%</span></div>
+            </div>
+            <div class="flex-1 space-y-1.5">
+              <div class="flex justify-between text-sm"><span style="color:var(--text-muted);">Outstanding</span><span class="font-semibold font-mono">$24,250</span></div>
+              <div class="flex justify-between text-sm"><span style="color:var(--text-muted);">Principal</span><span class="font-medium font-mono" style="color:var(--text-secondary);">$30,000</span></div>
+              <div class="flex justify-between text-sm"><span style="color:var(--text-muted);">Rate</span><span class="font-medium font-mono" style="color:var(--text-secondary);">6.2% APR</span></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between rounded-xl mt-4 p-3" style="background:var(--surface-secondary);">
+            <div><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Next Payment</p><p class="text-sm font-semibold font-mono mt-0.5">$400.00</p></div>
+            <div class="text-right"><p class="text-[10px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Due</p><p class="text-sm font-medium mt-0.5">Apr 1</p></div>
+          </div>
+        </div>
+
+        <!-- Apply CTA -->
+        <a href="borrower-apply.html" class="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-5 text-sm font-medium transition card-lift" style="border-color:var(--border);color:var(--text-muted);" onmouseover="this.style.borderColor='var(--brand-400)';this.style.color='var(--brand-600)';this.style.background='rgba(97,114,243,0.03)';" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)';this.style.background='transparent';">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Apply for a new loan
+        </a>
+      </div>
+
+      <!-- Sidebar (1/3) -->
+      <div class="space-y-6">
+        <!-- Recent Activity -->
+        <div class="rounded-2xl border shadow-sm" style="background:var(--surface);border-color:var(--border);">
+          <div class="px-5 py-4 border-b" style="border-color:var(--border);"><h3 class="text-sm font-semibold">Recent Activity</h3></div>
+          <div class="p-5 space-y-0">
+            <!-- Timeline items -->
+            <div class="flex gap-3 pb-5">
+              <div class="flex flex-col items-center"><div class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-brand-500" style="background:rgba(97,114,243,0.08);"><svg class="h-3 w-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div><div class="w-px flex-1 mt-1" style="background:var(--border);"></div></div>
+              <div class="pt-0.5"><p class="text-sm font-medium">Payment received</p><p class="text-xs mt-0.5" style="color:var(--text-muted);">$847.50 · Mar 15</p></div>
+            </div>
+            <div class="flex gap-3 pb-5">
+              <div class="flex flex-col items-center"><div class="flex h-7 w-7 items-center justify-center rounded-full border-2" style="border-color:var(--border);background:var(--surface);"><svg class="h-3 w-3" style="color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg></div><div class="w-px flex-1 mt-1" style="background:var(--border);"></div></div>
+              <div class="pt-0.5"><p class="text-sm font-medium">Auto-debit scheduled</p><p class="text-xs mt-0.5" style="color:var(--text-muted);">$400.00 · Apr 1</p></div>
+            </div>
+            <div class="flex gap-3 pb-5">
+              <div class="flex flex-col items-center"><div class="flex h-7 w-7 items-center justify-center rounded-full border-2" style="border-color:var(--border);background:var(--surface);"><svg class="h-3 w-3" style="color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg></div><div class="w-px flex-1 mt-1" style="background:var(--border);"></div></div>
+              <div class="pt-0.5"><p class="text-sm font-medium">Statement generated</p><p class="text-xs mt-0.5" style="color:var(--text-muted);">March 2026</p></div>
+            </div>
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center"><div class="flex h-7 w-7 items-center justify-center rounded-full border-2" style="border-color:var(--border);background:var(--surface);"><svg class="h-3 w-3" style="color:var(--text-muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75"/></svg></div></div>
+              <div class="pt-0.5"><p class="text-sm font-medium">Loan disbursed</p><p class="text-xs mt-0.5" style="color:var(--text-muted);">$30,000 · Feb 1</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="rounded-2xl border p-5 shadow-sm space-y-2" style="background:var(--surface);border-color:var(--border);">
+          <h3 class="text-sm font-semibold mb-3">Quick Actions</h3>
+          <a href="borrower-apply.html" class="flex items-center gap-3 rounded-xl p-3 transition" style="color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg" style="background:rgba(97,114,243,0.08);"><svg class="h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg></div>
+            <span class="text-sm font-medium">New Loan Application</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 rounded-xl p-3 transition" style="color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg" style="background:rgba(97,114,243,0.08);"><svg class="h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg></div>
+            <span class="text-sm font-medium">Payment Schedule</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 rounded-xl p-3 transition" style="color:var(--text-secondary);" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg" style="background:rgba(97,114,243,0.08);"><svg class="h-4 w-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg></div>
+            <span class="text-sm font-medium">Download Statements</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Payments Table -->
+    <div class="rounded-2xl border shadow-sm overflow-hidden" style="background:var(--surface);border-color:var(--border);">
+      <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color:var(--border);">
+        <h3 class="text-sm font-semibold">Recent Payments</h3>
+        <a href="#" class="text-xs font-medium text-brand-600 hover:text-brand-700 transition">View all</a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr style="background:var(--surface-secondary);">
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Date</th>
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Loan</th>
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Amount</th>
+            <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Status</th>
+          </tr></thead>
+          <tbody class="divide-y" style="--tw-divide-opacity:1;border-color:var(--border);">
+            <tr class="transition" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+              <td class="px-5 py-3.5 font-medium">Mar 15, 2026</td>
+              <td class="px-5 py-3.5" style="color:var(--text-secondary);">Personal Loan</td>
+              <td class="px-5 py-3.5 font-mono font-medium">$847.50</td>
+              <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold" style="background:rgba(16,185,129,0.1);color:#059669;"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Paid</span></td>
+            </tr>
+            <tr class="transition" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+              <td class="px-5 py-3.5 font-medium">Mar 1, 2026</td>
+              <td class="px-5 py-3.5" style="color:var(--text-secondary);">Auto Loan</td>
+              <td class="px-5 py-3.5 font-mono font-medium">$400.00</td>
+              <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold" style="background:rgba(16,185,129,0.1);color:#059669;"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Paid</span></td>
+            </tr>
+            <tr class="transition" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+              <td class="px-5 py-3.5 font-medium">Feb 15, 2026</td>
+              <td class="px-5 py-3.5" style="color:var(--text-secondary);">Personal Loan</td>
+              <td class="px-5 py-3.5 font-mono font-medium">$847.50</td>
+              <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold" style="background:rgba(16,185,129,0.1);color:#059669;"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Paid</span></td>
+            </tr>
+            <tr class="transition" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background='transparent'">
+              <td class="px-5 py-3.5 font-medium">Feb 1, 2026</td>
+              <td class="px-5 py-3.5" style="color:var(--text-secondary);">Auto Loan</td>
+              <td class="px-5 py-3.5 font-mono font-medium">$400.00</td>
+              <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold" style="background:rgba(16,185,129,0.1);color:#059669;"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Paid</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Mobile bottom nav -->
+<nav class="fixed bottom-0 inset-x-0 z-30 border-t sm:hidden" style="background:var(--surface);border-color:var(--border);">
+  <div class="flex items-center justify-around py-2">
+    <a href="borrower-dashboard.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] font-semibold text-brand-600">
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+      Home
+    </a>
+    <a href="borrower-applications.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] font-medium" style="color:var(--text-muted);">
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+      Apply
+    </a>
+    <a href="borrower-loan-detail.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] font-medium" style="color:var(--text-muted);">
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75"/></svg>
+      Loans
+    </a>
+    <a href="#" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] font-medium" style="color:var(--text-muted);">
+      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+      Profile
+    </a>
+  </div>
+</nav>
+
+<script>
+// Redirect to login if not authenticated
+if (!api.isLoggedIn()) { window.location.href = 'login.html'; }
+
+// Load dashboard data
+document.addEventListener('alpine:init', () => {
+  Alpine.data('dashboardData', () => ({
+    user: api.getUser() || {},
+    loans: [],
+    applications: [],
+    payments: [],
+    stats: { activeLoans: 0, outstanding: '$0', creditScore: '--', paymentsMade: 0 },
+    loaded: false,
+
+    async init() {
+      try {
+        const user = await api.getProfile();
+        api.setUser(user);
+        this.user = user;
+
+        const [loansRes, appsRes, paymentsRes] = await Promise.all([
+          api.getLoans(),
+          api.getApplications(),
+          api.getPayments(),
+        ]);
+
+        this.loans = loansRes.results || [];
+        this.applications = appsRes.results || [];
+        this.payments = paymentsRes.results || [];
+
+        // Calculate stats
+        const active = this.loans.filter(l => l.status === 'active');
+        this.stats.activeLoans = active.length;
+        const total = active.reduce((s, l) => s + parseFloat(l.outstanding_principal || 0), 0);
+        this.stats.outstanding = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        this.stats.paymentsMade = this.payments.filter(p => p.status === 'completed').length;
+
+        // Update DOM elements with real data
+        document.querySelectorAll('[data-stat]').forEach(el => {
+          const key = el.dataset.stat;
+          if (this.stats[key] !== undefined) el.textContent = this.stats[key];
+        });
+
+        this.loaded = true;
+      } catch (e) {
+        console.error('Dashboard load error:', e);
+        if (e?.status === 401) window.location.href = 'login.html';
+      }
+    },
+
+    get greeting() {
+      const h = new Date().getHours();
+      if (h < 12) return 'Good morning';
+      if (h < 17) return 'Good afternoon';
+      return 'Good evening';
+    },
+
+    get displayName() {
+      return this.user.first_name || this.user.username || 'User';
+    },
+
+    get initials() {
+      return (this.user.first_name?.[0] || '') + (this.user.last_name?.[0] || '');
+    }
+  }));
+});
+</script>
+
+</body>
+</html>
